@@ -128,6 +128,8 @@
   .task-meta .prio-high { color: var(--accent); }
   .task-meta .prio-med { color: var(--warn); }
   .task-meta .prio-low { color: var(--text-faint); }
+  .task-note-preview { font-size: 11px; color: var(--text-dim); margin-top: 4px; line-height: 1.4; white-space: pre-wrap; word-break: break-word; border-left: 2px solid var(--border-bright); padding-left: 8px; }
+  .task-note-indicator { color: var(--gold); }
   .task-del { background: none; border: none; color: var(--text-faint); cursor: pointer; font-size: 16px; padding: 4px 8px; }
   .task-del:hover { color: var(--accent); }
 
@@ -195,8 +197,10 @@
   .schedule-list { list-style: none; }
   .schedule-item { display: grid; grid-template-columns: 100px 1fr auto; gap: 12px; padding: 10px 0; border-bottom: 1px dashed var(--border); align-items: baseline; }
   .schedule-item:last-child { border-bottom: none; }
-  .schedule-time { font-size: 11px; color: var(--gold); }
-  .schedule-task { font-size: 13px; }
+  .schedule-time { font-size: 11px; color: var(--gold); cursor: pointer; }
+  .schedule-task { font-size: 13px; cursor: pointer; }
+  .schedule-time:hover, .schedule-task:hover { color: var(--text); }
+  .schedule-time:hover { color: var(--gold); text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 3px; }
   .schedule-header { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.2em; padding: 14px 0 4px; border-bottom: 1px solid var(--border); }
   .schedule-header.past { color: var(--gold); opacity: 0.55; }
   .schedule-header:first-child { padding-top: 4px; }
@@ -423,7 +427,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut as fbSignOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut as fbSignOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
   import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   // ============================================
@@ -441,11 +445,15 @@ const firebaseConfig = {
 
   const isConfigured = !firebaseConfig.apiKey.startsWith('PASTE_');
 
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+                       || window.navigator.standalone === true;
+
   let app, auth, db, currentUser, userDocRef, unsubscribe;
   if (isConfigured) {
     app = initializeApp(firebaseConfig);
     auth = getAuth(app);
     db = getFirestore(app);
+    setPersistence(auth, browserLocalPersistence).catch(e => console.error('Persistence error', e));
   }
 
   function emptyState() {
@@ -714,20 +722,22 @@ const firebaseConfig = {
           else { dueText = `due ${t.due.slice(5)}`; }
         }
         const prioLabel = t.priority === 'high' ? '↑ High' : t.priority === 'low' ? '↓ Low' : '· Med';
+        const notePreview = t.note ? (t.note.length > 140 ? escapeHtml(t.note.slice(0, 140)) + '…' : escapeHtml(t.note)) : '';
         li.innerHTML = `
           <div class="task-check" data-id="${t.id}"></div>
-          <div class="task-body" data-id="${t.id}">
-            <div class="task-text">${escapeHtml(t.text)}</div>
+          <div class="task-body" data-id="${t.id}" title="Click to edit">
+            <div class="task-text">${escapeHtml(t.text)}${t.note ? ' <span class="task-note-indicator" title="Has notes">●</span>' : ''}</div>
             <div class="task-meta">
               <span class="cat">${escapeHtml(t.category)}</span>
               <span class="prio-${t.priority}">${prioLabel}</span>
               ${dueText ? `<span class="${dueClass}">${dueText}</span>` : ''}
             </div>
+            ${notePreview ? `<div class="task-note-preview">${notePreview}</div>` : ''}
           </div>
-          <button class="task-del" data-id="${t.id}">×</button>
+          <button class="task-del" data-id="${t.id}" title="Delete">×</button>
         `;
         li.querySelector('.task-check').onclick = () => toggleTask(t.id);
-        li.querySelector('.task-body').onclick = () => toggleTask(t.id);
+        li.querySelector('.task-body').onclick = () => openTaskEditModal(t.id);
         li.querySelector('.task-del').onclick = () => deleteTask(t.id);
         ul.appendChild(li);
       });
@@ -792,6 +802,52 @@ const firebaseConfig = {
     renderTasks();
     debouncedSave();
   }
+
+  let editingTaskId = null;
+  window.openTaskEditModal = (id) => {
+    const t = state.tasks.find(x => x.id === id);
+    if (!t) return;
+    editingTaskId = id;
+    const catOptions = state.categories.map(c =>
+      `<option value="${escapeHtml(c)}"${c === t.category ? ' selected' : ''}>${escapeHtml(c)}</option>`
+    ).join('');
+    showModal(`
+      <h3>Edit Task</h3>
+      <div class="modal-row"><label>Task</label><input type="text" id="te-text" value="${escapeHtml(t.text)}"></div>
+      <div class="modal-row"><label>Category</label><select id="te-category">${catOptions}</select></div>
+      <div class="modal-row"><label>Priority</label>
+        <select id="te-priority">
+          <option value="high"${t.priority === 'high' ? ' selected' : ''}>High</option>
+          <option value="med"${t.priority === 'med' ? ' selected' : ''}>Medium</option>
+          <option value="low"${t.priority === 'low' ? ' selected' : ''}>Low</option>
+        </select>
+      </div>
+      <div class="modal-row"><label>Due date</label><input type="date" id="te-due" value="${t.due || ''}"></div>
+      <div class="modal-row"><label>Notes</label><textarea id="te-note" rows="6" placeholder="Context, links, decisions, anything you need to remember…">${escapeHtml(t.note || '')}</textarea></div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+        <button class="btn" onclick="saveTaskEdit()">Save</button>
+      </div>
+    `);
+    setTimeout(() => document.getElementById('te-text')?.focus(), 0);
+  };
+
+  window.saveTaskEdit = () => {
+    const t = state.tasks.find(x => x.id === editingTaskId);
+    if (!t) { closeModal(); return; }
+    const text = document.getElementById('te-text').value.trim();
+    if (!text) { alert('Task text required'); return; }
+    t.text = text;
+    t.category = document.getElementById('te-category').value;
+    t.priority = document.getElementById('te-priority').value;
+    t.due = document.getElementById('te-due').value || null;
+    const note = document.getElementById('te-note').value.trim();
+    t.note = note || null;
+    editingTaskId = null;
+    closeModal();
+    renderTasks();
+    debouncedSave();
+  };
 
   function deleteTask(id) {
     state.tasks = state.tasks.filter(t => t.id !== id);
@@ -1256,6 +1312,42 @@ const firebaseConfig = {
     }
   }
 
+  async function updateGcalEvent(item) {
+    try {
+      const token = await ensureCalendarToken();
+      if (!token) { setCalendarStatus('not connected', 'warn'); return false; }
+      const parsed = parseScheduleTime(item.time, item.date);
+      if (!parsed) { setCalendarStatus('skipped (bad time)', 'warn'); return false; }
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const body = {
+        summary: item.task,
+        start: { dateTime: parsed.start.toISOString(), timeZone: tz },
+        end: { dateTime: parsed.end.toISOString(), timeZone: tz }
+      };
+      const data = await gcalRequest('/calendars/primary/events/' + encodeURIComponent(item.gcalEventId), {
+        method: 'PATCH',
+        body: JSON.stringify(body)
+      });
+      if (data) {
+        setCalendarStatus('synced', 'ok');
+        return true;
+      }
+      delete item.gcalEventId;
+      const newId = await createGcalEvent(item);
+      if (newId) {
+        item.gcalEventId = newId;
+        setCalendarStatus('synced', 'ok');
+        return true;
+      }
+      return false;
+    } catch (e) {
+      if (e.message === 'TOKEN_EXPIRED') setCalendarStatus('reconnect', 'warn');
+      else setCalendarStatus('error', 'warn');
+      console.error('Calendar update failed', e);
+      return false;
+    }
+  }
+
   async function pushCalendarEvent(item) {
     try {
       const token = await ensureCalendarToken();
@@ -1347,10 +1439,13 @@ const firebaseConfig = {
         const li = document.createElement('li');
         li.className = 'schedule-item';
         li.innerHTML = `
-          <span class="schedule-time">${escapeHtml(s.time)}</span>
-          <span class="schedule-task">${escapeHtml(s.task)}</span>
-          <button class="task-del" data-id="${s.id}">×</button>
+          <span class="schedule-time" title="Click to edit">${escapeHtml(s.time)}</span>
+          <span class="schedule-task" title="Click to edit">${escapeHtml(s.task)}</span>
+          <button class="task-del" data-id="${s.id}" title="Delete">×</button>
         `;
+        const openEdit = () => openScheduleEditModal(s.id);
+        li.querySelector('.schedule-time').onclick = openEdit;
+        li.querySelector('.schedule-task').onclick = openEdit;
         li.querySelector('.task-del').onclick = async () => {
           const removed = state.schedule.find(x => x.id === s.id);
           state.schedule = state.schedule.filter(x => x.id !== s.id);
@@ -1362,6 +1457,49 @@ const firebaseConfig = {
       });
     });
   }
+
+  let editingScheduleId = null;
+  window.openScheduleEditModal = (id) => {
+    const s = state.schedule.find(x => x.id === id);
+    if (!s) return;
+    editingScheduleId = id;
+    const dateVal = s.date || todayStr();
+    showModal(`
+      <h3>Edit Schedule Item</h3>
+      <div class="modal-row"><label>Date</label><input type="date" id="se-date" value="${dateVal}"></div>
+      <div class="modal-row"><label>Time</label><input type="text" id="se-time" value="${escapeHtml(s.time || '')}" placeholder="07:00 — 08:00"></div>
+      <div class="modal-row"><label>Task</label><input type="text" id="se-task" value="${escapeHtml(s.task || '')}"></div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+        <button class="btn" onclick="saveScheduleEdit()">Save</button>
+      </div>
+    `);
+    setTimeout(() => document.getElementById('se-task')?.focus(), 0);
+  };
+
+  window.saveScheduleEdit = async () => {
+    const s = state.schedule.find(x => x.id === editingScheduleId);
+    if (!s) { closeModal(); return; }
+    const date = document.getElementById('se-date').value;
+    const time = document.getElementById('se-time').value.trim();
+    const task = document.getElementById('se-task').value.trim();
+    if (!time || !task) { alert('Time and task required'); return; }
+    if (date && date !== todayStr()) s.date = date;
+    else delete s.date;
+    s.time = time;
+    s.task = task;
+    editingScheduleId = null;
+    closeModal();
+    renderSchedule();
+    debouncedSave();
+    if (s.gcalEventId) {
+      const ok = await updateGcalEvent(s);
+      if (ok) saveToCloud();
+    } else {
+      const created = await pushCalendarEvent(s);
+      if (created) saveToCloud();
+    }
+  };
 
   window.addScheduleItem = async () => {
     const dateInput = document.getElementById('sched-date').value.trim();
@@ -1473,6 +1611,23 @@ const firebaseConfig = {
     if (!isConfigured) { alert('Firebase not configured. See SETUP.md.'); return; }
     const provider = new GoogleAuthProvider();
     provider.addScope(CALENDAR_SCOPE);
+
+    if (isStandalone) {
+      // iOS PWA: popup only. signInWithRedirect leaves the PWA → goes to Safari
+      // → returns to a fresh PWA instance with no shared storage → infinite loop.
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        if (credential?.accessToken) sessionStorage.setItem('gcal_token', credential.accessToken);
+      } catch (e) {
+        console.error('Standalone sign-in failed:', e);
+        if (e?.code !== 'auth/popup-closed-by-user' && e?.code !== 'auth/cancelled-popup-request') {
+          alert('Sign-in failed in app mode. Open this site in Safari, sign in there, then return to the app.');
+        }
+      }
+      return;
+    }
+
     try {
       const result = await signInWithPopup(auth, provider);
       const credential = GoogleAuthProvider.credentialFromResult(result);
@@ -1563,13 +1718,15 @@ const firebaseConfig = {
       document.getElementById('config-warning').classList.remove('hidden');
       return;
     }
-    try {
-      const result = await getRedirectResult(auth);
-      if (result) {
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        if (credential?.accessToken) sessionStorage.setItem('gcal_token', credential.accessToken);
-      }
-    } catch (e) { console.error(e); }
+    if (!isStandalone) {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result) {
+          const credential = GoogleAuthProvider.credentialFromResult(result);
+          if (credential?.accessToken) sessionStorage.setItem('gcal_token', credential.accessToken);
+        }
+      } catch (e) { console.error(e); }
+    }
     onAuthStateChanged(auth, (user) => {
       if (user) bootstrapUser(user);
       else {
