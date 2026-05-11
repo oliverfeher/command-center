@@ -197,7 +197,11 @@
   .schedule-item:last-child { border-bottom: none; }
   .schedule-time { font-size: 11px; color: var(--gold); }
   .schedule-task { font-size: 13px; }
-  .schedule-add { display: grid; grid-template-columns: 110px 1fr auto; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border); }
+  .schedule-header { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.2em; padding: 14px 0 4px; border-bottom: 1px solid var(--border); }
+  .schedule-header.past { color: var(--gold); opacity: 0.55; }
+  .schedule-header:first-child { padding-top: 4px; }
+  .schedule-add { display: grid; grid-template-columns: 130px 110px 1fr auto; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border); }
+  .schedule-add input[type=date] { padding: 10px 8px; font-size: 11px; color-scheme: dark; }
 
   .review-q { margin-bottom: 14px; }
   .review-q-label { font-size: 11px; color: var(--gold); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.1em; }
@@ -363,10 +367,11 @@
 
 <div class="grid-2">
   <div class="card">
-    <div class="card-label">Template</div>
+    <div class="card-label">Template <a id="gcal-status" href="#" onclick="return connectCalendar(event)" title="Click to connect or reconnect Google Calendar" style="margin-left:8px;color:var(--text-dim);text-decoration:none;border-bottom:1px dotted var(--border);">· calendar: —</a></div>
     <div class="card-title">Daily Schedule</div>
     <ul class="schedule-list" id="schedule-list"></ul>
     <div class="schedule-add">
+      <input type="date" id="sched-date" title="Leave empty for today">
       <input type="text" id="sched-time" placeholder="07:00 — 08:00">
       <input type="text" id="sched-task" placeholder="Task">
       <button class="btn btn-sm" onclick="addScheduleItem()">Add</button>
@@ -1132,7 +1137,183 @@ const firebaseConfig = {
     }
   }
 
+  // CALENDAR SYNC
+  const CALENDAR_SCOPE = 'https://www.googleapis.com/auth/calendar.events';
+  let calendarSyncBusy = false;
+
+  function setCalendarStatus(text, kind) {
+    const el = document.getElementById('gcal-status');
+    if (!el) return;
+    el.textContent = '· calendar: ' + text;
+    const color = kind === 'ok' ? 'var(--accent)' : kind === 'warn' ? 'var(--gold)' : 'var(--text-dim)';
+    el.style.color = color;
+  }
+
+  async function ensureCalendarToken({ interactive = false } = {}) {
+    let token = sessionStorage.getItem('gcal_token');
+    if (token) return token;
+    if (!interactive || !auth) return null;
+    const provider = new GoogleAuthProvider();
+    provider.addScope(CALENDAR_SCOPE);
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      token = credential?.accessToken || null;
+      if (token) sessionStorage.setItem('gcal_token', token);
+      return token;
+    } catch (e) {
+      console.error('Calendar auth failed', e);
+      return null;
+    }
+  }
+
+  window.connectCalendar = async (e) => {
+    if (e) e.preventDefault();
+    setCalendarStatus('connecting…', 'sync');
+    const token = await ensureCalendarToken({ interactive: true });
+    if (token) {
+      setCalendarStatus('connected', 'ok');
+      syncMissingCalendarEvents();
+    } else {
+      setCalendarStatus('not connected', 'warn');
+    }
+    return false;
+  };
+
+  async function gcalRequest(path, opts = {}) {
+    const token = await ensureCalendarToken();
+    if (!token) throw new Error('NO_TOKEN');
+    const res = await fetch('https://www.googleapis.com/calendar/v3' + path, {
+      ...opts,
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+        ...(opts.headers || {})
+      }
+    });
+    if (res.status === 401 || res.status === 403) {
+      sessionStorage.removeItem('gcal_token');
+      throw new Error('TOKEN_EXPIRED');
+    }
+    if (res.status === 410 || res.status === 404) return null;
+    if (!res.ok) throw new Error('Calendar API ' + res.status);
+    if (res.status === 204) return null;
+    const text = await res.text();
+    return text ? JSON.parse(text) : null;
+  }
+
+  function parseHMPart(s) {
+    const m = (s || '').trim().match(/^(\d{1,2})(?::(\d{2}))?\s*(am|pm)?$/i);
+    if (!m) return null;
+    let h = parseInt(m[1], 10);
+    const min = m[2] ? parseInt(m[2], 10) : 0;
+    const ampm = m[3]?.toLowerCase();
+    if (ampm === 'pm' && h < 12) h += 12;
+    if (ampm === 'am' && h === 12) h = 0;
+    if (h > 23 || min > 59) return null;
+    return { h, m: min };
+  }
+
+  function parseScheduleTime(timeStr, dateStr) {
+    if (!timeStr) return null;
+    const cleaned = timeStr.replace(/[—–]/g, '-').replace(/\bto\b/i, '-').trim();
+    const parts = cleaned.split(/\s*-\s*/);
+    const start = parseHMPart(parts[0]);
+    if (!start) return null;
+    const end = parts[1] ? parseHMPart(parts[1]) : null;
+    const base = dateStr ? new Date(dateStr + 'T00:00:00') : new Date();
+    const y = base.getFullYear(), mo = base.getMonth(), d = base.getDate();
+    const startDate = new Date(y, mo, d, start.h, start.m);
+    let endDate = end ? new Date(y, mo, d, end.h, end.m) : new Date(startDate.getTime() + 30 * 60000);
+    if (endDate <= startDate) endDate = new Date(startDate.getTime() + 30 * 60000);
+    return { start: startDate, end: endDate };
+  }
+
+  async function createGcalEvent(item) {
+    const parsed = parseScheduleTime(item.time, item.date);
+    if (!parsed) return null;
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const body = {
+      summary: item.task,
+      start: { dateTime: parsed.start.toISOString(), timeZone: tz },
+      end: { dateTime: parsed.end.toISOString(), timeZone: tz },
+      source: { title: 'Command Center', url: location.href }
+    };
+    const data = await gcalRequest('/calendars/primary/events', {
+      method: 'POST',
+      body: JSON.stringify(body)
+    });
+    return data?.id || null;
+  }
+
+  async function deleteGcalEvent(eventId) {
+    if (!eventId) return;
+    try {
+      await gcalRequest('/calendars/primary/events/' + encodeURIComponent(eventId), { method: 'DELETE' });
+    } catch (e) {
+      if (e.message === 'TOKEN_EXPIRED') setCalendarStatus('reconnect', 'warn');
+      console.warn('Calendar delete failed', e);
+    }
+  }
+
+  async function pushCalendarEvent(item) {
+    try {
+      const token = await ensureCalendarToken();
+      if (!token) { setCalendarStatus('not connected', 'warn'); return false; }
+      const id = await createGcalEvent(item);
+      if (id) {
+        item.gcalEventId = id;
+        setCalendarStatus('synced', 'ok');
+        return true;
+      }
+      setCalendarStatus('skipped (bad time)', 'warn');
+      return false;
+    } catch (e) {
+      if (e.message === 'TOKEN_EXPIRED') setCalendarStatus('reconnect', 'warn');
+      else setCalendarStatus('error', 'warn');
+      console.error('Calendar push failed', e);
+      return false;
+    }
+  }
+
+  async function syncMissingCalendarEvents() {
+    if (calendarSyncBusy) return;
+    if (!Array.isArray(state.schedule) || state.schedule.length === 0) {
+      setCalendarStatus('synced', 'ok');
+      return;
+    }
+    const token = await ensureCalendarToken();
+    if (!token) { setCalendarStatus('not connected', 'warn'); return; }
+    const missing = state.schedule.filter(s => !s.gcalEventId);
+    if (missing.length === 0) { setCalendarStatus('synced', 'ok'); return; }
+    calendarSyncBusy = true;
+    setCalendarStatus('syncing ' + missing.length + '…', 'sync');
+    try {
+      let changed = false;
+      for (const item of missing) {
+        const ok = await pushCalendarEvent(item);
+        if (ok) changed = true;
+        else break;
+      }
+      if (changed) saveToCloud();
+      setCalendarStatus('synced', 'ok');
+    } finally {
+      calendarSyncBusy = false;
+    }
+  }
+
   // SCHEDULE
+  function formatScheduleDate(date, today) {
+    if (date === today) return 'Today';
+    const d = new Date(date + 'T00:00:00');
+    const t = new Date(today + 'T00:00:00');
+    const diffDays = Math.round((d - t) / 86400000);
+    const label = d.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' });
+    if (diffDays === 1) return 'Tomorrow · ' + label;
+    if (diffDays === -1) return 'Yesterday · ' + label;
+    return label;
+  }
+
   function renderSchedule() {
     const ul = document.getElementById('schedule-list');
     ul.innerHTML = '';
@@ -1140,33 +1321,63 @@ const firebaseConfig = {
       ul.innerHTML = '<li class="empty">No schedule items yet.</li>';
       return;
     }
+    const today = todayStr();
+    const groups = new Map();
     state.schedule.forEach(s => {
-      const li = document.createElement('li');
-      li.className = 'schedule-item';
-      li.innerHTML = `
-        <span class="schedule-time">${escapeHtml(s.time)}</span>
-        <span class="schedule-task">${escapeHtml(s.task)}</span>
-        <button class="task-del" data-id="${s.id}">×</button>
-      `;
-      li.querySelector('.task-del').onclick = () => {
-        state.schedule = state.schedule.filter(x => x.id !== s.id);
-        renderSchedule();
-        debouncedSave();
-      };
-      ul.appendChild(li);
+      const date = s.date || today;
+      if (!groups.has(date)) groups.set(date, []);
+      groups.get(date).push(s);
+    });
+    groups.forEach(items => items.sort((a, b) => (a.time || '').localeCompare(b.time || '')));
+
+    const dates = [...groups.keys()];
+    const futureDates = dates.filter(d => d > today).sort();
+    const pastDates = dates.filter(d => d < today).sort().reverse();
+    const ordered = [];
+    if (groups.has(today)) ordered.push(today);
+    ordered.push(...futureDates, ...pastDates);
+
+    ordered.forEach(date => {
+      const header = document.createElement('li');
+      header.className = 'schedule-header' + (date < today ? ' past' : '');
+      header.textContent = formatScheduleDate(date, today);
+      ul.appendChild(header);
+
+      groups.get(date).forEach(s => {
+        const li = document.createElement('li');
+        li.className = 'schedule-item';
+        li.innerHTML = `
+          <span class="schedule-time">${escapeHtml(s.time)}</span>
+          <span class="schedule-task">${escapeHtml(s.task)}</span>
+          <button class="task-del" data-id="${s.id}">×</button>
+        `;
+        li.querySelector('.task-del').onclick = async () => {
+          const removed = state.schedule.find(x => x.id === s.id);
+          state.schedule = state.schedule.filter(x => x.id !== s.id);
+          renderSchedule();
+          debouncedSave();
+          if (removed?.gcalEventId) await deleteGcalEvent(removed.gcalEventId);
+        };
+        ul.appendChild(li);
+      });
     });
   }
 
-  window.addScheduleItem = () => {
+  window.addScheduleItem = async () => {
+    const dateInput = document.getElementById('sched-date').value.trim();
     const time = document.getElementById('sched-time').value.trim();
     const task = document.getElementById('sched-task').value.trim();
     if (!time || !task) return;
-    state.schedule.push({ id: uid(), time, task });
-    state.schedule.sort((a, b) => a.time.localeCompare(b.time));
+    const item = { id: uid(), time, task };
+    if (dateInput && dateInput !== todayStr()) item.date = dateInput;
+    state.schedule.push(item);
+    document.getElementById('sched-date').value = '';
     document.getElementById('sched-time').value = '';
     document.getElementById('sched-task').value = '';
     renderSchedule();
     debouncedSave();
+    const created = await pushCalendarEvent(item);
+    if (created) saveToCloud();
   };
 
   // REVIEW
@@ -1261,8 +1472,11 @@ const firebaseConfig = {
   window.signIn = async () => {
     if (!isConfigured) { alert('Firebase not configured. See SETUP.md.'); return; }
     const provider = new GoogleAuthProvider();
+    provider.addScope(CALENDAR_SCOPE);
     try {
-      await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(auth, provider);
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      if (credential?.accessToken) sessionStorage.setItem('gcal_token', credential.accessToken);
     } catch (e) {
       await signInWithRedirect(auth, provider);
     }
@@ -1270,6 +1484,7 @@ const firebaseConfig = {
 
   window.signOut = async () => {
     if (unsubscribe) unsubscribe();
+    sessionStorage.removeItem('gcal_token');
     await fbSignOut(auth);
     location.reload();
   };
@@ -1313,6 +1528,9 @@ const firebaseConfig = {
       document.getElementById('auth-screen').classList.add('hidden');
       document.getElementById('app').classList.remove('hidden');
       renderAll();
+      const hasToken = !!sessionStorage.getItem('gcal_token');
+      setCalendarStatus(hasToken ? 'syncing…' : 'click to connect', hasToken ? 'sync' : 'warn');
+      syncMissingCalendarEvents().catch(e => console.error('Calendar backfill failed', e));
     } catch (e) {
       console.error('Bootstrap error', e);
       setSyncStatus('error');
@@ -1345,7 +1563,13 @@ const firebaseConfig = {
       document.getElementById('config-warning').classList.remove('hidden');
       return;
     }
-    try { await getRedirectResult(auth); } catch (e) { console.error(e); }
+    try {
+      const result = await getRedirectResult(auth);
+      if (result) {
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        if (credential?.accessToken) sessionStorage.setItem('gcal_token', credential.accessToken);
+      }
+    } catch (e) { console.error(e); }
     onAuthStateChanged(auth, (user) => {
       if (user) bootstrapUser(user);
       else {
