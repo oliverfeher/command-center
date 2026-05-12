@@ -216,10 +216,31 @@
   .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; display: none; align-items: center; justify-content: center; padding: 20px; }
   .modal-bg.open { display: flex; }
   .modal { background: var(--bg-card); border: 1px solid var(--border-bright); padding: 24px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; }
+  .modal.wide { max-width: 760px; }
   .modal h3 { font-family: 'Fraunces', serif; font-weight: 500; margin-bottom: 16px; font-size: 20px; }
   .modal-row { margin-bottom: 12px; }
   .modal-row label { display: block; font-size: 10px; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 6px; }
   .modal-actions { display: flex; gap: 8px; margin-top: 16px; justify-content: flex-end; }
+  .modal-row-inline { display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 12px; }
+  @media (min-width: 600px) { .modal-row-inline { grid-template-columns: 2fr 1fr 1fr; } }
+  .modal-section { margin-top: 18px; padding-top: 16px; border-top: 1px dashed var(--border); }
+  .modal-section-label { font-family: 'Fraunces', serif; font-size: 13px; color: var(--gold); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.18em; font-weight: 500; }
+  .modal-section .hint { font-size: 10px; color: var(--text-faint); margin-bottom: 6px; }
+  .link-row { display: grid; grid-template-columns: 1fr 2fr auto; gap: 6px; margin-bottom: 6px; align-items: center; }
+  .link-row input { padding: 6px 8px; font-size: 12px; }
+  .link-row .rm { background: none; border: none; color: var(--text-faint); cursor: pointer; font-size: 16px; padding: 2px 6px; }
+  .link-row .rm:hover { color: var(--accent); }
+  .attachment-row { display: flex; gap: 10px; align-items: center; padding: 8px 10px; background: var(--bg); border: 1px solid var(--border); margin-bottom: 6px; }
+  .attachment-row .icon { font-size: 14px; }
+  .attachment-row .name { flex: 1; font-size: 12px; word-break: break-all; color: var(--text); text-decoration: none; }
+  .attachment-row .name:hover { color: var(--gold); }
+  .attachment-row .size { font-size: 10px; color: var(--text-faint); white-space: nowrap; }
+  .attachment-row .rm { background: none; border: none; color: var(--text-faint); cursor: pointer; font-size: 16px; padding: 0 4px; }
+  .attachment-row .rm:hover { color: var(--accent); }
+  .upload-progress { height: 3px; background: var(--border); margin-top: 8px; display: none; }
+  .upload-progress.show { display: block; }
+  .upload-progress-fill { height: 100%; background: var(--gold); width: 0%; transition: width 0.15s linear; }
+  .task-meta .has-links, .task-meta .has-files { color: var(--gold); }
 
   .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; color: var(--text-faint); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; }
   .footer button { background: none; border: none; color: var(--text-faint); cursor: pointer; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; font-family: inherit; }
@@ -429,6 +450,7 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut as fbSignOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
   import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
   // ============================================
   // 🔧 PASTE YOUR FIREBASE CONFIG BELOW 🔧
@@ -448,11 +470,12 @@ const firebaseConfig = {
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches
                        || window.navigator.standalone === true;
 
-  let app, auth, db, currentUser, userDocRef, unsubscribe;
+  let app, auth, db, storage, currentUser, userDocRef, unsubscribe;
   if (isConfigured) {
     app = initializeApp(firebaseConfig);
     auth = getAuth(app);
     db = getFirestore(app);
+    storage = getStorage(app);
     setPersistence(auth, browserLocalPersistence).catch(e => console.error('Persistence error', e));
   }
 
@@ -722,15 +745,22 @@ const firebaseConfig = {
           else { dueText = `due ${t.due.slice(5)}`; }
         }
         const prioLabel = t.priority === 'high' ? '↑ High' : t.priority === 'low' ? '↓ Low' : '· Med';
-        const notePreview = t.note ? (t.note.length > 140 ? escapeHtml(t.note.slice(0, 140)) + '…' : escapeHtml(t.note)) : '';
+        migrateTaskShape(t);
+        const desc = t.description || '';
+        const notePreview = desc ? (desc.length > 140 ? escapeHtml(desc.slice(0, 140)) + '…' : escapeHtml(desc)) : '';
+        const hasDetail = !!(t.description || t.userStory || t.kpi);
+        const linkCount = t.links?.length || 0;
+        const fileCount = t.attachments?.length || 0;
         li.innerHTML = `
           <div class="task-check" data-id="${t.id}"></div>
           <div class="task-body" data-id="${t.id}" title="Click to edit">
-            <div class="task-text">${escapeHtml(t.text)}${t.note ? ' <span class="task-note-indicator" title="Has notes">●</span>' : ''}</div>
+            <div class="task-text">${escapeHtml(t.text)}${hasDetail ? ' <span class="task-note-indicator" title="Has details">●</span>' : ''}</div>
             <div class="task-meta">
               <span class="cat">${escapeHtml(t.category)}</span>
               <span class="prio-${t.priority}">${prioLabel}</span>
               ${dueText ? `<span class="${dueClass}">${dueText}</span>` : ''}
+              ${linkCount ? `<span class="has-links" title="${linkCount} link${linkCount>1?'s':''}">🔗 ${linkCount}</span>` : ''}
+              ${fileCount ? `<span class="has-files" title="${fileCount} file${fileCount>1?'s':''}">📎 ${fileCount}</span>` : ''}
             </div>
             ${notePreview ? `<div class="task-note-preview">${notePreview}</div>` : ''}
           </div>
@@ -804,52 +834,243 @@ const firebaseConfig = {
   }
 
   let editingTaskId = null;
+
+  function migrateTaskShape(t) {
+    if (t.note && !t.description) { t.description = t.note; delete t.note; }
+    if (!Array.isArray(t.links)) t.links = [];
+    if (!Array.isArray(t.attachments)) t.attachments = [];
+  }
+
   window.openTaskEditModal = (id) => {
     const t = state.tasks.find(x => x.id === id);
     if (!t) return;
+    migrateTaskShape(t);
     editingTaskId = id;
     const catOptions = state.categories.map(c =>
       `<option value="${escapeHtml(c)}"${c === t.category ? ' selected' : ''}>${escapeHtml(c)}</option>`
     ).join('');
     showModal(`
-      <h3>Edit Task</h3>
-      <div class="modal-row"><label>Task</label><input type="text" id="te-text" value="${escapeHtml(t.text)}"></div>
-      <div class="modal-row"><label>Category</label><select id="te-category">${catOptions}</select></div>
-      <div class="modal-row"><label>Priority</label>
-        <select id="te-priority">
-          <option value="high"${t.priority === 'high' ? ' selected' : ''}>High</option>
-          <option value="med"${t.priority === 'med' ? ' selected' : ''}>Medium</option>
-          <option value="low"${t.priority === 'low' ? ' selected' : ''}>Low</option>
-        </select>
+      <h3>Task Detail</h3>
+      <div class="modal-row"><label>Title</label><input type="text" id="te-text" value="${escapeHtml(t.text)}"></div>
+      <div class="modal-row-inline">
+        <div><label>Category</label><select id="te-category">${catOptions}</select></div>
+        <div><label>Priority</label>
+          <select id="te-priority">
+            <option value="high"${t.priority === 'high' ? ' selected' : ''}>High</option>
+            <option value="med"${t.priority === 'med' ? ' selected' : ''}>Medium</option>
+            <option value="low"${t.priority === 'low' ? ' selected' : ''}>Low</option>
+          </select>
+        </div>
+        <div><label>Due date</label><input type="date" id="te-due" value="${t.due || ''}"></div>
       </div>
-      <div class="modal-row"><label>Due date</label><input type="date" id="te-due" value="${t.due || ''}"></div>
-      <div class="modal-row"><label>Notes</label><textarea id="te-note" rows="6" placeholder="Context, links, decisions, anything you need to remember…">${escapeHtml(t.note || '')}</textarea></div>
+
+      <div class="modal-section">
+        <div class="modal-section-label">Description</div>
+        <textarea id="te-description" rows="4" placeholder="Context, decisions, anything you need to remember.">${escapeHtml(t.description || '')}</textarea>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-label">User Story</div>
+        <div class="hint">As a [user], I want [feature], so that [benefit].</div>
+        <textarea id="te-userstory" rows="3" placeholder="As a founder, I want to track deep work hours, so that I know where my time goes.">${escapeHtml(t.userStory || '')}</textarea>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-label">KPI / Success Metric</div>
+        <div class="hint">How will we know this worked?</div>
+        <textarea id="te-kpi" rows="2" placeholder="e.g. Conversion +15% within 30 days of launch.">${escapeHtml(t.kpi || '')}</textarea>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-label">Links</div>
+        <div id="te-links"></div>
+        <button class="btn btn-sm btn-secondary" type="button" onclick="addTaskLinkRow()">+ Add Link</button>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-label">Attachments</div>
+        <div id="te-attachments"></div>
+        <input type="file" id="te-file-input" style="display:none" multiple>
+        <button class="btn btn-sm btn-secondary" type="button" onclick="document.getElementById('te-file-input').click()">⬆ Upload File</button>
+        <div class="upload-progress" id="te-progress"><div class="upload-progress-fill" id="te-progress-fill"></div></div>
+      </div>
+
       <div class="modal-actions">
         <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
         <button class="btn" onclick="saveTaskEdit()">Save</button>
       </div>
     `);
+    document.getElementById('modal-content').classList.add('wide');
+    renderTaskLinkRows();
+    renderTaskAttachmentRows();
+    document.getElementById('te-file-input').onchange = (e) => uploadTaskFiles(e.target.files);
     setTimeout(() => document.getElementById('te-text')?.focus(), 0);
   };
+
+  function renderTaskLinkRows() {
+    const t = state.tasks.find(x => x.id === editingTaskId);
+    if (!t) return;
+    const el = document.getElementById('te-links');
+    el.innerHTML = '';
+    t.links.forEach((lnk, i) => {
+      const row = document.createElement('div');
+      row.className = 'link-row';
+      row.innerHTML = `
+        <input type="text" placeholder="Label" value="${escapeHtml(lnk.label || '')}" data-idx="${i}" data-f="label">
+        <input type="text" placeholder="https://" value="${escapeHtml(lnk.url || '')}" data-idx="${i}" data-f="url">
+        <button class="rm" type="button" data-idx="${i}" title="Remove">×</button>
+      `;
+      row.querySelectorAll('input').forEach(inp => {
+        inp.oninput = (e) => {
+          const idx = +e.target.dataset.idx;
+          t.links[idx][e.target.dataset.f] = e.target.value;
+        };
+      });
+      row.querySelector('.rm').onclick = () => {
+        t.links.splice(i, 1);
+        renderTaskLinkRows();
+      };
+      el.appendChild(row);
+    });
+  }
+
+  window.addTaskLinkRow = () => {
+    const t = state.tasks.find(x => x.id === editingTaskId);
+    if (!t) return;
+    t.links.push({ url: '', label: '' });
+    renderTaskLinkRows();
+  };
+
+  function renderTaskAttachmentRows() {
+    const t = state.tasks.find(x => x.id === editingTaskId);
+    if (!t) return;
+    const el = document.getElementById('te-attachments');
+    el.innerHTML = '';
+    if (t.attachments.length === 0) {
+      el.innerHTML = '<div class="hint" style="margin-bottom:8px">No files yet.</div>';
+      return;
+    }
+    t.attachments.forEach(a => {
+      const row = document.createElement('div');
+      row.className = 'attachment-row';
+      row.innerHTML = `
+        <span class="icon">${fileIcon(a.type, a.name)}</span>
+        <a class="name" href="${escapeHtml(a.url)}" target="_blank" rel="noopener">${escapeHtml(a.name)}</a>
+        <span class="size">${formatBytes(a.size)}</span>
+        <button class="rm" type="button" title="Remove">×</button>
+      `;
+      row.querySelector('.rm').onclick = () => removeTaskAttachment(a.id);
+      el.appendChild(row);
+    });
+  }
+
+  function fileIcon(mime, name) {
+    const m = (mime || '').toLowerCase();
+    const ext = (name || '').split('.').pop().toLowerCase();
+    if (m.startsWith('image/')) return '🖼';
+    if (m === 'application/pdf' || ext === 'pdf') return '📕';
+    if (m.includes('spreadsheet') || ['xls','xlsx','csv'].includes(ext)) return '📊';
+    if (m.includes('word') || ['doc','docx'].includes(ext)) return '📄';
+    if (m.startsWith('video/')) return '🎬';
+    if (m.startsWith('audio/')) return '🎵';
+    if (['zip','tar','gz','rar'].includes(ext)) return '🗜';
+    return '📎';
+  }
+
+  function formatBytes(b) {
+    if (!b && b !== 0) return '';
+    if (b < 1024) return b + ' B';
+    if (b < 1024 * 1024) return (b / 1024).toFixed(1) + ' KB';
+    return (b / 1024 / 1024).toFixed(1) + ' MB';
+  }
+
+  async function uploadTaskFiles(files) {
+    if (!files || files.length === 0) return;
+    const t = state.tasks.find(x => x.id === editingTaskId);
+    if (!t) return;
+    if (!storage || !currentUser) { alert('Not signed in.'); return; }
+    const progressEl = document.getElementById('te-progress');
+    const progressFill = document.getElementById('te-progress-fill');
+    progressEl.classList.add('show');
+    for (const file of files) {
+      const fileId = uid();
+      const safeName = file.name.replace(/[^\w.\-]+/g, '_');
+      const path = `users/${currentUser.uid}/tasks/${t.id}/${fileId}_${safeName}`;
+      const ref = storageRef(storage, path);
+      try {
+        const task = uploadBytesResumable(ref, file);
+        await new Promise((resolve, reject) => {
+          task.on('state_changed',
+            snap => {
+              const pct = (snap.bytesTransferred / snap.totalBytes) * 100;
+              progressFill.style.width = pct + '%';
+            },
+            err => reject(err),
+            () => resolve()
+          );
+        });
+        const url = await getDownloadURL(ref);
+        t.attachments.push({
+          id: fileId, name: file.name, path, url,
+          size: file.size, type: file.type || '',
+          uploadedAt: new Date().toISOString()
+        });
+        renderTaskAttachmentRows();
+        debouncedSave();
+      } catch (e) {
+        console.error('Upload failed', e);
+        alert(`Upload failed: ${file.name}\n${e.message || e.code || ''}`);
+      }
+      progressFill.style.width = '0%';
+    }
+    progressEl.classList.remove('show');
+    document.getElementById('te-file-input').value = '';
+  }
+
+  async function removeTaskAttachment(attachmentId) {
+    const t = state.tasks.find(x => x.id === editingTaskId);
+    if (!t) return;
+    const a = t.attachments.find(x => x.id === attachmentId);
+    if (!a) return;
+    if (!confirm(`Remove "${a.name}"?`)) return;
+    try {
+      if (storage && a.path) await deleteObject(storageRef(storage, a.path));
+    } catch (e) {
+      console.warn('Storage delete failed (continuing):', e);
+    }
+    t.attachments = t.attachments.filter(x => x.id !== attachmentId);
+    renderTaskAttachmentRows();
+    renderTasks();
+    debouncedSave();
+  }
 
   window.saveTaskEdit = () => {
     const t = state.tasks.find(x => x.id === editingTaskId);
     if (!t) { closeModal(); return; }
     const text = document.getElementById('te-text').value.trim();
-    if (!text) { alert('Task text required'); return; }
+    if (!text) { alert('Task title required'); return; }
     t.text = text;
     t.category = document.getElementById('te-category').value;
     t.priority = document.getElementById('te-priority').value;
     t.due = document.getElementById('te-due').value || null;
-    const note = document.getElementById('te-note').value.trim();
-    t.note = note || null;
+    t.description = (document.getElementById('te-description').value || '').trim() || null;
+    t.userStory = (document.getElementById('te-userstory').value || '').trim() || null;
+    t.kpi = (document.getElementById('te-kpi').value || '').trim() || null;
+    t.links = (t.links || []).filter(l => (l.url || '').trim());
     editingTaskId = null;
     closeModal();
     renderTasks();
     debouncedSave();
   };
 
-  function deleteTask(id) {
+  async function deleteTask(id) {
+    const t = state.tasks.find(x => x.id === id);
+    if (t?.attachments?.length && storage) {
+      for (const a of t.attachments) {
+        try { if (a.path) await deleteObject(storageRef(storage, a.path)); }
+        catch (e) { console.warn('Storage cleanup failed:', e); }
+      }
+    }
     state.tasks = state.tasks.filter(t => t.id !== id);
     renderTasks();
     debouncedSave();
@@ -1590,6 +1811,7 @@ const firebaseConfig = {
   }
   window.closeModal = () => {
     document.getElementById('modal-bg').classList.remove('open');
+    document.getElementById('modal-content').classList.remove('wide');
   };
   document.getElementById('modal-bg').onclick = (e) => {
     if (e.target.id === 'modal-bg') closeModal();
