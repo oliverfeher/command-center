@@ -2300,23 +2300,24 @@ const firebaseConfig = {
     if (!Array.isArray(json.days)) throw new Error('"days" must be an array');
     const days = json.days.map((d, i) => {
       if (!d || typeof d !== 'object') throw new Error(`days[${i}] must be an object`);
-      if (typeof d.name !== 'string' || !d.name.trim()) throw new Error(`days[${i}].name (string) required`);
+      const dayName = typeof d.name === 'string' ? d.name.trim() : '';
+      if (!dayName) throw new Error(`days[${i}].name (string) required`);
       if (!Array.isArray(d.exercises)) throw new Error(`days[${i}].exercises must be an array`);
-      const exercises = d.exercises.map((e, j) => {
+      const indexed = d.exercises.map((e, j) => {
         if (!e || typeof e !== 'object') throw new Error(`days[${i}].exercises[${j}] must be an object`);
-        if (typeof e.name !== 'string' || !e.name.trim()) throw new Error(`days[${i}].exercises[${j}].name (string) required`);
-        const sets = Number.isFinite(+e.sets) && +e.sets > 0 ? Math.min(20, Math.floor(+e.sets)) : 3;
-        const reps = e.reps != null ? String(e.reps) : '';
-        return { id: uid(), name: e.name.trim(), sets, reps };
+        const exName = (typeof e.exercise === 'string' && e.exercise.trim())
+          || (typeof e.name === 'string' && e.name.trim()) || '';
+        if (!exName) throw new Error(`days[${i}].exercises[${j}] needs "exercise" or "name"`);
+        const order = Number.isFinite(+e.order) ? +e.order : (j + 1);
+        return { name: exName, order };
       });
-      let weekday = null;
-      if (d.weekday != null) {
-        const w = +d.weekday;
-        if (Number.isFinite(w) && w >= 1 && w <= 7) weekday = Math.floor(w);
-      }
-      return { id: uid(), name: d.name.trim(), weekday, exercises };
+      indexed.sort((a, b) => a.order - b.order);
+      const exercises = indexed.map(e => ({ id: uid(), name: e.name, sets: 3, reps: '' }));
+      return { id: uid(), name: dayName, weekday: null, exercises };
     });
-    return { name: typeof json.name === 'string' ? json.name : '', days };
+    const topName = (typeof json.split_name === 'string' && json.split_name)
+      || (typeof json.name === 'string' && json.name) || '';
+    return { name: topName, days };
   }
 
   function applyImportedSplit(parsedJson) {
@@ -2377,22 +2378,22 @@ const firebaseConfig = {
 
   window.downloadSplitSchema = () => {
     const example = {
-      name: "Push/Pull/Legs",
+      split_name: "Push/Pull/Legs",
       days: [
-        { name: "Push", weekday: 1, exercises: [
-          { name: "Bench Press", sets: 4, reps: "5-8" },
-          { name: "Overhead Press", sets: 3, reps: "8-10" },
-          { name: "Incline DB Press", sets: 3, reps: "10-12" }
+        { name: "Push", exercises: [
+          { order: 1, exercise: "Bench Press" },
+          { order: 2, exercise: "Overhead Press" },
+          { order: 3, exercise: "Incline DB Press" }
         ]},
-        { name: "Pull", weekday: 3, exercises: [
-          { name: "Deadlift", sets: 3, reps: "5" },
-          { name: "Pull-up", sets: 4, reps: "AMRAP" },
-          { name: "Barbell Row", sets: 3, reps: "8-10" }
+        { name: "Pull", exercises: [
+          { order: 1, exercise: "Deadlift" },
+          { order: 2, exercise: "Pull-up" },
+          { order: 3, exercise: "Barbell Row" }
         ]},
-        { name: "Legs", weekday: 5, exercises: [
-          { name: "Back Squat", sets: 4, reps: "5-8" },
-          { name: "Romanian Deadlift", sets: 3, reps: "8-10" },
-          { name: "Leg Press", sets: 3, reps: "10-12" }
+        { name: "Legs", exercises: [
+          { order: 1, exercise: "Back Squat" },
+          { order: 2, exercise: "Romanian Deadlift" },
+          { order: 3, exercise: "Leg Press" }
         ]}
       ]
     };
