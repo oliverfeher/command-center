@@ -253,6 +253,58 @@
   .chart-area { fill: var(--gold); opacity: 0.1; }
   .chart-dot { fill: var(--accent); }
   .danger { color: var(--accent); }
+
+  /* Tabs */
+  .tab-nav { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 24px; overflow-x: auto; }
+  .tab { background: transparent; border: none; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; padding: 12px 16px; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--text); border-bottom-color: var(--gold); }
+
+  /* Workout */
+  .workout-row { display: grid; grid-template-columns: auto 1fr; gap: 16px; margin-bottom: 16px; align-items: end; }
+  @media (max-width: 600px) { .workout-row { grid-template-columns: 1fr; } }
+  .workout-row label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--text-dim); display: block; margin-bottom: 4px; }
+  .workout-day-strip { display: flex; flex-wrap: wrap; gap: 6px; }
+  .workout-day-pill { background: transparent; border: 1px solid var(--border); color: var(--text-dim); padding: 8px 14px; font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; cursor: pointer; }
+  .workout-day-pill.active { border-color: var(--gold); color: var(--gold); }
+  .workout-day-pill:hover { color: var(--text); }
+  .exercise-block { border-bottom: 1px dashed var(--border); padding: 14px 0; }
+  .exercise-block:last-child { border-bottom: none; }
+  .exercise-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; gap: 8px; }
+  .exercise-name { font-family: 'Fraunces', serif; font-size: 17px; }
+  .exercise-meta { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.15em; }
+  .set-grid { display: grid; grid-template-columns: 24px 1fr 1fr 24px; gap: 6px; align-items: center; margin-bottom: 4px; }
+  .set-grid .set-n { font-size: 10px; color: var(--text-faint); text-align: center; }
+  .set-grid input { padding: 8px 10px; font-size: 13px; }
+  .set-grid .set-del { background: none; border: none; color: var(--text-faint); cursor: pointer; font-size: 14px; }
+  .set-grid .set-del:hover { color: var(--accent); }
+  .set-add { background: transparent; border: 1px dashed var(--border-bright); color: var(--text-dim); padding: 6px 10px; font-family: inherit; font-size: 10px; cursor: pointer; margin-top: 6px; text-transform: uppercase; letter-spacing: 0.1em; }
+  .set-add:hover { color: var(--gold); border-color: var(--gold); }
+
+  .split-day-card { border: 1px solid var(--border); padding: 14px; margin-bottom: 12px; }
+  .split-day-card .day-header-row { display: grid; grid-template-columns: 1fr 130px auto; gap: 8px; align-items: center; margin-bottom: 10px; }
+  .split-day-card .day-header-row input, .split-day-card .day-header-row select { padding: 8px 10px; font-size: 12px; }
+  .split-exercise-row { display: grid; grid-template-columns: 1fr 60px 80px 24px; gap: 6px; margin-bottom: 6px; align-items: center; }
+  .split-exercise-row input { padding: 6px 8px; font-size: 12px; }
+  .split-exercise-row .del-btn { background: none; border: none; color: var(--text-faint); cursor: pointer; font-size: 14px; }
+  .split-exercise-row .del-btn:hover { color: var(--accent); }
+
+  .progress-chart { width: 100%; height: 260px; background: var(--bg); border: 1px solid var(--border); padding: 12px; margin-top: 12px; }
+  .chart-axis { stroke: var(--border); stroke-width: 1; }
+  .chart-grid { stroke: var(--border); stroke-width: 1; opacity: 0.4; }
+  .chart-text { fill: var(--text-faint); font-size: 9px; font-family: 'JetBrains Mono', monospace; }
+  .chart-text.x { text-anchor: middle; }
+  .chart-text.y { text-anchor: end; }
+
+  .session-history { margin-top: 16px; }
+  .session-history-item { display: grid; grid-template-columns: 90px 1fr auto; gap: 12px; padding: 8px 0; border-bottom: 1px dashed var(--border); font-size: 12px; align-items: baseline; }
+  .session-history-item:last-child { border-bottom: none; }
+  .session-history-date { color: var(--gold); font-size: 11px; }
+  .session-history-detail { color: var(--text-dim); font-size: 11px; }
+
+  .upload-row { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+  .json-textarea { width: 100%; min-height: 160px; font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 10px; background: var(--bg); color: var(--text); border: 1px solid var(--border); }
+  .workout-error { color: var(--accent); font-size: 11px; margin-top: 8px; white-space: pre-wrap; padding: 8px; border: 1px solid var(--accent); background: rgba(230, 57, 70, 0.05); }
 </style>
 </head>
 <body>
@@ -289,6 +341,13 @@
     <div class="sync-indicator" id="sync-indicator">●</div>
   </div>
 </header>
+
+<nav class="tab-nav">
+  <button class="tab active" data-view="dashboard" onclick="showView('dashboard')">Dashboard</button>
+  <button class="tab" data-view="workouts" onclick="showView('workouts')">Workouts</button>
+</nav>
+
+<div class="view" id="view-dashboard">
 
 <div class="countdowns" id="countdowns"></div>
 
@@ -433,6 +492,83 @@
   </div>
 </div>
 
+</div><!-- /view-dashboard -->
+
+<div class="view hidden" id="view-workouts">
+
+  <div class="card" style="margin-bottom: 16px;">
+    <div class="card-label">Log</div>
+    <div class="card-title">Today's Session <span class="meta" id="workout-session-meta">—</span></div>
+
+    <div id="workout-no-split" class="empty hidden">
+      No split yet. Scroll down to upload a JSON or build one in the editor.
+    </div>
+
+    <div id="workout-log-area" class="hidden">
+      <div class="workout-row">
+        <div>
+          <label>Date</label>
+          <input type="date" id="workout-date">
+        </div>
+        <div>
+          <label>Day</label>
+          <div class="workout-day-strip" id="workout-day-strip"></div>
+        </div>
+      </div>
+
+      <div id="workout-exercises"></div>
+
+      <button class="btn" onclick="saveWorkoutSession()" style="margin-top: 16px;">Save Session</button>
+      <button class="btn btn-secondary" id="workout-delete-session" onclick="deleteCurrentWorkoutSession()" style="margin-top: 16px; margin-left: 8px; display:none;">Delete This Session</button>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom: 16px;">
+    <div class="card-label">Track</div>
+    <div class="card-title">Progress</div>
+    <div id="workout-progress-empty" class="empty">Log a session to see your progress.</div>
+    <div id="workout-progress-area" class="hidden">
+      <div class="workout-row">
+        <div>
+          <label>Exercise</label>
+          <select id="workout-progress-picker" onchange="renderWorkoutProgress()"></select>
+        </div>
+        <div></div>
+      </div>
+      <div class="progress-chart" id="workout-progress-chart"></div>
+      <div class="session-history" id="workout-progress-history"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">Plan</div>
+    <div class="card-title">Split <span class="meta" id="workout-split-meta">—</span></div>
+
+    <div class="upload-row">
+      <input type="file" id="workout-file-input" accept=".json,application/json" style="display:none" onchange="handleSplitFile(event)">
+      <button class="btn btn-sm" onclick="document.getElementById('workout-file-input').click()">Upload JSON</button>
+      <button class="btn btn-sm btn-secondary" onclick="toggleWorkoutPaste()">Paste JSON</button>
+      <button class="btn btn-sm btn-secondary" onclick="downloadSplitSchema()">Schema</button>
+      <button class="btn btn-sm btn-secondary" onclick="addSplitDay()">+ Day</button>
+    </div>
+
+    <div id="workout-paste-area" class="hidden" style="margin-bottom: 12px;">
+      <textarea id="workout-paste" class="json-textarea" placeholder="Paste split JSON here..."></textarea>
+      <div style="margin-top: 8px;">
+        <button class="btn btn-sm" onclick="importPastedSplit()">Import</button>
+        <button class="btn btn-sm btn-secondary" onclick="document.getElementById('workout-paste-area').classList.add('hidden')">Cancel</button>
+      </div>
+    </div>
+
+    <div id="workout-error" class="workout-error hidden"></div>
+
+    <input type="text" id="workout-split-name" placeholder="Split name (e.g. PPL)" style="margin-bottom: 12px;" onchange="updateSplitName(this.value)">
+
+    <div id="workout-split-editor"></div>
+  </div>
+
+</div><!-- /view-workouts -->
+
 <footer class="footer">
   <span id="user-email">—</span>
   <span>Saved · <span id="last-saved">—</span></span>
@@ -485,8 +621,17 @@ const firebaseConfig = {
       tasks: [], projects: [], metrics: [], habits: [],
       habitHistory: {}, schedule: [], countdowns: [],
       sessions: [], reviews: [],
+      workout: { split: { name: '', days: [] }, sessions: [] },
       lastDate: todayStr(), createdAt: todayStr()
     };
+  }
+
+  function ensureWorkoutShape() {
+    if (!state.workout || typeof state.workout !== 'object') state.workout = { split: { name: '', days: [] }, sessions: [] };
+    if (!state.workout.split || typeof state.workout.split !== 'object') state.workout.split = { name: '', days: [] };
+    if (typeof state.workout.split.name !== 'string') state.workout.split.name = '';
+    if (!Array.isArray(state.workout.split.days)) state.workout.split.days = [];
+    if (!Array.isArray(state.workout.sessions)) state.workout.sessions = [];
   }
 
   let state = emptyState();
@@ -1823,6 +1968,555 @@ const firebaseConfig = {
     if (e.target.id === 'modal-bg') closeModal();
   };
 
+  // WORKOUTS
+  const WEEKDAY_SHORT = ['', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const workoutUI = {
+    selectedDate: null,
+    selectedDayId: null,
+    selectedExerciseName: null,
+    workingSets: {}
+  };
+
+  window.showView = (name) => {
+    document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+    const target = document.getElementById('view-' + name);
+    if (target) target.classList.remove('hidden');
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.view === name));
+    if (name === 'workouts') renderWorkout();
+  };
+
+  function isoWeekday(dateStr) {
+    const d = new Date(dateStr + 'T00:00:00');
+    const js = d.getDay();
+    return js === 0 ? 7 : js;
+  }
+
+  function autoSuggestDay(dateStr) {
+    const iso = isoWeekday(dateStr);
+    return state.workout.split.days.find(d => d.weekday === iso) || null;
+  }
+
+  function findSession(dateStr, dayId) {
+    return state.workout.sessions.find(s => s.date === dateStr && s.dayId === dayId) || null;
+  }
+
+  function emptySet() { return { weight: '', reps: '' }; }
+
+  function renderWorkout() {
+    if (!state.workout) return;
+    const split = state.workout.split;
+    const hasSplit = split.days.length > 0;
+    const noSplitEl = document.getElementById('workout-no-split');
+    const logArea = document.getElementById('workout-log-area');
+    if (!noSplitEl || !logArea) return;
+    noSplitEl.classList.toggle('hidden', hasSplit);
+    logArea.classList.toggle('hidden', !hasSplit);
+
+    document.getElementById('workout-split-meta').textContent = hasSplit ? `${split.days.length} day${split.days.length === 1 ? '' : 's'}` : 'empty';
+    const nameInput = document.getElementById('workout-split-name');
+    if (nameInput && document.activeElement !== nameInput) nameInput.value = split.name || '';
+
+    renderSplitEditor();
+
+    if (!workoutUI.selectedDate) workoutUI.selectedDate = todayStr();
+    const dateInput = document.getElementById('workout-date');
+    if (dateInput && document.activeElement !== dateInput) dateInput.value = workoutUI.selectedDate;
+    if (dateInput) {
+      dateInput.onchange = (e) => {
+        workoutUI.selectedDate = e.target.value || todayStr();
+        workoutUI.selectedDayId = null;
+        workoutUI.workingSets = {};
+        renderWorkout();
+      };
+    }
+
+    if (hasSplit) {
+      if (!workoutUI.selectedDayId || !split.days.find(d => d.id === workoutUI.selectedDayId)) {
+        const sugg = autoSuggestDay(workoutUI.selectedDate);
+        workoutUI.selectedDayId = sugg ? sugg.id : split.days[0].id;
+        workoutUI.workingSets = {};
+      }
+      renderWorkoutDayStrip();
+      renderWorkoutExercises();
+    }
+
+    renderWorkoutProgressTab();
+  }
+
+  function renderWorkoutDayStrip() {
+    const strip = document.getElementById('workout-day-strip');
+    if (!strip) return;
+    strip.innerHTML = '';
+    state.workout.split.days.forEach(day => {
+      const btn = document.createElement('button');
+      btn.className = 'workout-day-pill' + (day.id === workoutUI.selectedDayId ? ' active' : '');
+      const wd = day.weekday ? ' · ' + WEEKDAY_SHORT[day.weekday] : '';
+      btn.textContent = day.name + wd;
+      btn.onclick = () => {
+        workoutUI.selectedDayId = day.id;
+        workoutUI.workingSets = {};
+        renderWorkout();
+      };
+      strip.appendChild(btn);
+    });
+  }
+
+  function getWorkingSets(exerciseId, plannedCount) {
+    if (workoutUI.workingSets[exerciseId]) return workoutUI.workingSets[exerciseId];
+    const session = findSession(workoutUI.selectedDate, workoutUI.selectedDayId);
+    if (session) {
+      const e = session.entries.find(x => x.exerciseId === exerciseId);
+      if (e && e.sets && e.sets.length) {
+        workoutUI.workingSets[exerciseId] = JSON.parse(JSON.stringify(e.sets));
+        return workoutUI.workingSets[exerciseId];
+      }
+    }
+    const arr = [];
+    for (let i = 0; i < (plannedCount || 3); i++) arr.push(emptySet());
+    workoutUI.workingSets[exerciseId] = arr;
+    return arr;
+  }
+
+  function findLastSessionForExercise(name, beforeDate) {
+    const found = state.workout.sessions
+      .filter(s => s.date < beforeDate && s.entries.some(e => e.exerciseName === name))
+      .sort((a, b) => b.date.localeCompare(a.date))[0];
+    if (!found) return null;
+    return { session: found, entry: found.entries.find(e => e.exerciseName === name) };
+  }
+
+  function renderWorkoutExercises() {
+    const day = state.workout.split.days.find(d => d.id === workoutUI.selectedDayId);
+    const container = document.getElementById('workout-exercises');
+    if (!container) return;
+    container.innerHTML = '';
+    if (!day) return;
+
+    const session = findSession(workoutUI.selectedDate, workoutUI.selectedDayId);
+    const delBtn = document.getElementById('workout-delete-session');
+    if (delBtn) delBtn.style.display = session ? '' : 'none';
+    document.getElementById('workout-session-meta').textContent = session ? 'editing · ' + day.name : 'new · ' + day.name;
+
+    day.exercises.forEach(ex => {
+      const sets = getWorkingSets(ex.id, ex.sets);
+      const prev = findLastSessionForExercise(ex.name, workoutUI.selectedDate);
+
+      const block = document.createElement('div');
+      block.className = 'exercise-block';
+      const prevHint = prev ? `<div class="exercise-meta" style="margin-bottom:6px;color:var(--text-faint)">Last (${prev.session.date}): ${prev.entry.sets.map(s => `${s.weight}×${s.reps}`).join(' / ')}</div>` : '';
+      block.innerHTML = `
+        <div class="exercise-header">
+          <div class="exercise-name">${escapeHtml(ex.name)}</div>
+          <div class="exercise-meta">${ex.sets || 0}×${escapeHtml(ex.reps || '—')}</div>
+        </div>
+        ${prevHint}
+        <div class="set-list"></div>
+        <button class="set-add" type="button">+ Add Set</button>
+      `;
+
+      const setList = block.querySelector('.set-list');
+      sets.forEach((s, i) => {
+        const prevSet = prev && prev.entry.sets[i];
+        setList.appendChild(buildSetRow(ex.id, i, s, prevSet));
+      });
+
+      block.querySelector('.set-add').onclick = () => {
+        workoutUI.workingSets[ex.id].push(emptySet());
+        renderWorkoutExercises();
+      };
+
+      container.appendChild(block);
+    });
+  }
+
+  function buildSetRow(exerciseId, idx, set, prevSet) {
+    const row = document.createElement('div');
+    row.className = 'set-grid';
+    const prevW = prevSet && Number.isFinite(prevSet.weight) ? String(prevSet.weight) : 'lb';
+    const prevR = prevSet && Number.isFinite(prevSet.reps) ? String(prevSet.reps) : 'reps';
+    const wVal = (set.weight === '' || set.weight == null) ? '' : set.weight;
+    const rVal = (set.reps === '' || set.reps == null) ? '' : set.reps;
+    row.innerHTML = `
+      <span class="set-n">${idx + 1}</span>
+      <input type="number" step="0.5" inputmode="decimal" placeholder="${prevW}" value="${wVal}" data-field="weight">
+      <input type="number" inputmode="numeric" placeholder="${prevR}" value="${rVal}" data-field="reps">
+      <button class="set-del" type="button">×</button>
+    `;
+    row.querySelector('[data-field="weight"]').oninput = (e) => {
+      const v = e.target.value;
+      workoutUI.workingSets[exerciseId][idx].weight = v === '' ? '' : Number(v);
+    };
+    row.querySelector('[data-field="reps"]').oninput = (e) => {
+      const v = e.target.value;
+      workoutUI.workingSets[exerciseId][idx].reps = v === '' ? '' : Number(v);
+    };
+    row.querySelector('.set-del').onclick = () => {
+      workoutUI.workingSets[exerciseId].splice(idx, 1);
+      renderWorkoutExercises();
+    };
+    return row;
+  }
+
+  window.saveWorkoutSession = () => {
+    const day = state.workout.split.days.find(d => d.id === workoutUI.selectedDayId);
+    if (!day) return;
+    const entries = [];
+    day.exercises.forEach(ex => {
+      const sets = (workoutUI.workingSets[ex.id] || [])
+        .filter(s => Number.isFinite(s.weight) || Number.isFinite(s.reps))
+        .map(s => ({
+          weight: Number.isFinite(s.weight) ? Number(s.weight) : 0,
+          reps: Number.isFinite(s.reps) ? Number(s.reps) : 0
+        }));
+      if (sets.length === 0) return;
+      entries.push({ exerciseId: ex.id, exerciseName: ex.name, sets });
+    });
+
+    const existing = findSession(workoutUI.selectedDate, workoutUI.selectedDayId);
+    if (entries.length === 0) {
+      if (existing) {
+        if (!confirm('No sets entered — delete this session?')) return;
+        state.workout.sessions = state.workout.sessions.filter(s => s.id !== existing.id);
+        workoutUI.workingSets = {};
+        debouncedSave();
+        renderWorkout();
+      }
+      return;
+    }
+
+    if (existing) {
+      existing.entries = entries;
+      existing.dayName = day.name;
+    } else {
+      state.workout.sessions.push({
+        id: uid(),
+        date: workoutUI.selectedDate,
+        dayId: day.id,
+        dayName: day.name,
+        entries
+      });
+    }
+    debouncedSave();
+    workoutUI.workingSets = {};
+    renderWorkout();
+  };
+
+  window.deleteCurrentWorkoutSession = () => {
+    const existing = findSession(workoutUI.selectedDate, workoutUI.selectedDayId);
+    if (!existing) return;
+    if (!confirm(`Delete the ${existing.dayName} session on ${existing.date}?`)) return;
+    state.workout.sessions = state.workout.sessions.filter(s => s.id !== existing.id);
+    workoutUI.workingSets = {};
+    debouncedSave();
+    renderWorkout();
+  };
+
+  function renderSplitEditor() {
+    const editor = document.getElementById('workout-split-editor');
+    if (!editor) return;
+    editor.innerHTML = '';
+    state.workout.split.days.forEach(day => {
+      const card = document.createElement('div');
+      card.className = 'split-day-card';
+      card.innerHTML = `
+        <div class="day-header-row">
+          <input type="text" class="day-name" value="${escapeHtml(day.name)}" placeholder="Day name">
+          <select class="day-weekday">
+            <option value="">— no weekday —</option>
+            <option value="1">Monday</option>
+            <option value="2">Tuesday</option>
+            <option value="3">Wednesday</option>
+            <option value="4">Thursday</option>
+            <option value="5">Friday</option>
+            <option value="6">Saturday</option>
+            <option value="7">Sunday</option>
+          </select>
+          <button class="btn btn-sm btn-secondary danger day-del">Delete Day</button>
+        </div>
+        <div class="day-exercises"></div>
+        <button class="set-add ex-add" type="button">+ Exercise</button>
+      `;
+      card.querySelector('.day-weekday').value = day.weekday != null ? String(day.weekday) : '';
+      const exDiv = card.querySelector('.day-exercises');
+      day.exercises.forEach(ex => exDiv.appendChild(buildSplitExerciseRow(day, ex)));
+
+      card.querySelector('.day-name').onchange = (e) => { day.name = e.target.value.trim() || 'Untitled'; debouncedSave(); renderWorkout(); };
+      card.querySelector('.day-weekday').onchange = (e) => { day.weekday = e.target.value ? Number(e.target.value) : null; debouncedSave(); renderWorkout(); };
+      card.querySelector('.day-del').onclick = () => {
+        if (!confirm(`Delete day "${day.name}" and all its exercises?`)) return;
+        state.workout.split.days = state.workout.split.days.filter(d => d.id !== day.id);
+        debouncedSave();
+        renderWorkout();
+      };
+      card.querySelector('.ex-add').onclick = () => {
+        day.exercises.push({ id: uid(), name: 'New Exercise', sets: 3, reps: '8-12' });
+        debouncedSave();
+        renderWorkout();
+      };
+      editor.appendChild(card);
+    });
+  }
+
+  function buildSplitExerciseRow(day, ex) {
+    const row = document.createElement('div');
+    row.className = 'split-exercise-row';
+    row.innerHTML = `
+      <input type="text" value="${escapeHtml(ex.name)}" placeholder="Exercise">
+      <input type="number" min="1" max="20" value="${ex.sets || 3}" placeholder="sets">
+      <input type="text" value="${escapeHtml(ex.reps || '')}" placeholder="reps">
+      <button class="del-btn">×</button>
+    `;
+    const inputs = row.querySelectorAll('input');
+    inputs[0].onchange = (e) => { ex.name = e.target.value.trim() || 'Unnamed'; debouncedSave(); renderWorkout(); };
+    inputs[1].onchange = (e) => { ex.sets = Math.max(1, Math.min(20, Number(e.target.value) || 1)); debouncedSave(); };
+    inputs[2].onchange = (e) => { ex.reps = e.target.value.trim(); debouncedSave(); };
+    row.querySelector('.del-btn').onclick = () => {
+      if (!confirm(`Delete exercise "${ex.name}"?`)) return;
+      day.exercises = day.exercises.filter(x => x.id !== ex.id);
+      debouncedSave();
+      renderWorkout();
+    };
+    return row;
+  }
+
+  window.updateSplitName = (val) => {
+    state.workout.split.name = val || '';
+    debouncedSave();
+  };
+
+  window.addSplitDay = () => {
+    state.workout.split.days.push({
+      id: uid(),
+      name: 'New Day',
+      weekday: null,
+      exercises: []
+    });
+    debouncedSave();
+    renderWorkout();
+  };
+
+  function validateAndNormalizeSplit(json) {
+    if (!json || typeof json !== 'object') throw new Error('Root must be an object');
+    if (!Array.isArray(json.days)) throw new Error('"days" must be an array');
+    const days = json.days.map((d, i) => {
+      if (!d || typeof d !== 'object') throw new Error(`days[${i}] must be an object`);
+      if (typeof d.name !== 'string' || !d.name.trim()) throw new Error(`days[${i}].name (string) required`);
+      if (!Array.isArray(d.exercises)) throw new Error(`days[${i}].exercises must be an array`);
+      const exercises = d.exercises.map((e, j) => {
+        if (!e || typeof e !== 'object') throw new Error(`days[${i}].exercises[${j}] must be an object`);
+        if (typeof e.name !== 'string' || !e.name.trim()) throw new Error(`days[${i}].exercises[${j}].name (string) required`);
+        const sets = Number.isFinite(+e.sets) && +e.sets > 0 ? Math.min(20, Math.floor(+e.sets)) : 3;
+        const reps = e.reps != null ? String(e.reps) : '';
+        return { id: uid(), name: e.name.trim(), sets, reps };
+      });
+      let weekday = null;
+      if (d.weekday != null) {
+        const w = +d.weekday;
+        if (Number.isFinite(w) && w >= 1 && w <= 7) weekday = Math.floor(w);
+      }
+      return { id: uid(), name: d.name.trim(), weekday, exercises };
+    });
+    return { name: typeof json.name === 'string' ? json.name : '', days };
+  }
+
+  function applyImportedSplit(parsedJson) {
+    const errEl = document.getElementById('workout-error');
+    errEl.classList.add('hidden');
+    errEl.textContent = '';
+    try {
+      const normalized = validateAndNormalizeSplit(parsedJson);
+      if (state.workout.split.days.length > 0) {
+        if (!confirm('This will replace your current split. Continue?')) return;
+      }
+      state.workout.split = normalized;
+      workoutUI.selectedDayId = null;
+      workoutUI.workingSets = {};
+      debouncedSave();
+      renderWorkout();
+      document.getElementById('workout-paste-area').classList.add('hidden');
+    } catch (e) {
+      errEl.textContent = 'Import failed: ' + e.message;
+      errEl.classList.remove('hidden');
+    }
+  }
+
+  window.handleSplitFile = (event) => {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const json = JSON.parse(e.target.result);
+        applyImportedSplit(json);
+      } catch (err) {
+        const errEl = document.getElementById('workout-error');
+        errEl.textContent = 'Invalid JSON: ' + err.message;
+        errEl.classList.remove('hidden');
+      }
+      event.target.value = '';
+    };
+    reader.readAsText(file);
+  };
+
+  window.toggleWorkoutPaste = () => {
+    document.getElementById('workout-paste-area').classList.toggle('hidden');
+  };
+
+  window.importPastedSplit = () => {
+    const text = document.getElementById('workout-paste').value.trim();
+    if (!text) return;
+    try {
+      const json = JSON.parse(text);
+      applyImportedSplit(json);
+    } catch (err) {
+      const errEl = document.getElementById('workout-error');
+      errEl.textContent = 'Invalid JSON: ' + err.message;
+      errEl.classList.remove('hidden');
+    }
+  };
+
+  window.downloadSplitSchema = () => {
+    const example = {
+      name: "Push/Pull/Legs",
+      days: [
+        { name: "Push", weekday: 1, exercises: [
+          { name: "Bench Press", sets: 4, reps: "5-8" },
+          { name: "Overhead Press", sets: 3, reps: "8-10" },
+          { name: "Incline DB Press", sets: 3, reps: "10-12" }
+        ]},
+        { name: "Pull", weekday: 3, exercises: [
+          { name: "Deadlift", sets: 3, reps: "5" },
+          { name: "Pull-up", sets: 4, reps: "AMRAP" },
+          { name: "Barbell Row", sets: 3, reps: "8-10" }
+        ]},
+        { name: "Legs", weekday: 5, exercises: [
+          { name: "Back Squat", sets: 4, reps: "5-8" },
+          { name: "Romanian Deadlift", sets: 3, reps: "8-10" },
+          { name: "Leg Press", sets: 3, reps: "10-12" }
+        ]}
+      ]
+    };
+    const blob = new Blob([JSON.stringify(example, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'split-schema.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  function renderWorkoutProgressTab() {
+    const sessions = state.workout.sessions;
+    const empty = sessions.length === 0;
+    const emptyEl = document.getElementById('workout-progress-empty');
+    const areaEl = document.getElementById('workout-progress-area');
+    if (!emptyEl || !areaEl) return;
+    emptyEl.classList.toggle('hidden', !empty);
+    areaEl.classList.toggle('hidden', empty);
+    if (empty) return;
+
+    const names = new Set();
+    sessions.forEach(s => s.entries.forEach(e => names.add(e.exerciseName)));
+    const nameList = [...names].sort();
+
+    const picker = document.getElementById('workout-progress-picker');
+    if (!workoutUI.selectedExerciseName || !nameList.includes(workoutUI.selectedExerciseName)) {
+      workoutUI.selectedExerciseName = nameList[0];
+    }
+    picker.innerHTML = nameList.map(n => `<option value="${escapeHtml(n)}"${n === workoutUI.selectedExerciseName ? ' selected' : ''}>${escapeHtml(n)}</option>`).join('');
+    renderWorkoutProgress();
+  }
+
+  window.renderWorkoutProgress = () => {
+    const picker = document.getElementById('workout-progress-picker');
+    if (picker) workoutUI.selectedExerciseName = picker.value;
+    drawProgressChart();
+    renderProgressHistory();
+  };
+
+  function getProgressPoints(name) {
+    const points = [];
+    state.workout.sessions.forEach(s => {
+      const e = s.entries.find(en => en.exerciseName === name);
+      if (!e || !e.sets || e.sets.length === 0) return;
+      const top = e.sets.reduce((max, set) => (Number(set.weight) > max ? Number(set.weight) : max), 0);
+      if (top > 0) points.push({ date: s.date, weight: top, sets: e.sets });
+    });
+    points.sort((a, b) => a.date.localeCompare(b.date));
+    return points;
+  }
+
+  function drawProgressChart() {
+    const name = workoutUI.selectedExerciseName;
+    const container = document.getElementById('workout-progress-chart');
+    if (!container) return;
+    if (!name) { container.innerHTML = ''; return; }
+    const points = getProgressPoints(name);
+    if (points.length === 0) {
+      container.innerHTML = '<div class="empty">No sessions for this exercise yet.</div>';
+      return;
+    }
+    const w = 700, h = 220, padLeft = 44, padRight = 16, padTop = 16, padBottom = 32;
+    const innerW = w - padLeft - padRight;
+    const innerH = h - padTop - padBottom;
+    const weights = points.map(p => p.weight);
+    const minW = Math.min(...weights), maxW = Math.max(...weights);
+    const range = maxW - minW || 5;
+    const yMin = Math.max(0, Math.floor((minW - range * 0.1) / 5) * 5);
+    const yMax = Math.ceil((maxW + range * 0.1) / 5) * 5;
+    const yRange = (yMax - yMin) || 1;
+    const xFor = i => points.length === 1 ? padLeft + innerW / 2 : padLeft + (i / (points.length - 1)) * innerW;
+    const yFor = v => padTop + innerH - ((v - yMin) / yRange) * innerH;
+
+    const pathD = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${xFor(i)} ${yFor(p.weight)}`).join(' ');
+
+    const yTicks = [];
+    for (let i = 0; i <= 4; i++) {
+      const v = yMin + (yRange * i / 4);
+      yTicks.push({ y: yFor(v), label: Math.round(v) });
+    }
+    const xTickCount = Math.min(points.length, 6);
+    const xTicks = [];
+    for (let i = 0; i < xTickCount; i++) {
+      const idx = points.length === 1 ? 0 : Math.round((points.length - 1) * (i / Math.max(1, xTickCount - 1)));
+      xTicks.push({ x: xFor(idx), label: points[idx].date.slice(5) });
+    }
+
+    const yGridLines = yTicks.map(t => `<line class="chart-grid" x1="${padLeft}" y1="${t.y}" x2="${w - padRight}" y2="${t.y}"/>`).join('');
+    const yLabels = yTicks.map(t => `<text class="chart-text y" x="${padLeft - 6}" y="${t.y + 3}">${t.label}</text>`).join('');
+    const xLabels = xTicks.map(t => `<text class="chart-text x" x="${t.x}" y="${h - padBottom + 16}">${t.label}</text>`).join('');
+    const dots = points.map((p, i) => `<circle cx="${xFor(i)}" cy="${yFor(p.weight)}" r="3" class="chart-dot"><title>${p.date}: ${p.weight} lb</title></circle>`).join('');
+
+    container.innerHTML = `
+      <svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet" style="width:100%;height:100%">
+        ${yGridLines}
+        <line class="chart-axis" x1="${padLeft}" y1="${padTop}" x2="${padLeft}" y2="${h - padBottom}"/>
+        <line class="chart-axis" x1="${padLeft}" y1="${h - padBottom}" x2="${w - padRight}" y2="${h - padBottom}"/>
+        ${yLabels}
+        ${xLabels}
+        <path d="${pathD}" class="chart-line"/>
+        ${dots}
+        <text class="chart-text" x="${w - padRight}" y="${padTop + 10}" text-anchor="end" style="font-size: 10px;">top set · lb</text>
+      </svg>
+    `;
+  }
+
+  function renderProgressHistory() {
+    const name = workoutUI.selectedExerciseName;
+    const el = document.getElementById('workout-progress-history');
+    if (!el) return;
+    if (!name) { el.innerHTML = ''; return; }
+    const points = getProgressPoints(name).slice().reverse();
+    if (points.length === 0) { el.innerHTML = ''; return; }
+    el.innerHTML = points.slice(0, 12).map(p => `
+      <div class="session-history-item">
+        <div class="session-history-date">${p.date}</div>
+        <div class="session-history-detail">${p.sets.map(s => `${s.weight}×${s.reps}`).join(' / ')}</div>
+        <div class="exercise-meta">${p.weight} lb top</div>
+      </div>
+    `).join('');
+  }
+
   // EXPORT
   window.exportData = () => {
     const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
@@ -1887,6 +2581,7 @@ const firebaseConfig = {
         });
         if (!state.habitHistory) state.habitHistory = {};
         if (state.categories.length === 0) state.categories = ['General'];
+        ensureWorkoutShape();
         applyDailyResets();
         await setDoc(userDocRef, state);
       } else {
@@ -1904,6 +2599,7 @@ const firebaseConfig = {
           });
           if (!state.habitHistory) state.habitHistory = {};
           if (state.categories.length === 0) state.categories = ['General'];
+          ensureWorkoutShape();
           renderAll();
         }
       });
@@ -1937,6 +2633,7 @@ const firebaseConfig = {
     renderSessions();
     renderSchedule();
     renderReviews();
+    renderWorkout();
   }
 
   async function init() {
