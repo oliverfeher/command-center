@@ -365,6 +365,46 @@
   .fin-csv-table select { padding: 4px 6px; font-size: 10px; }
   .fin-csv-preview { max-height: 240px; overflow-y: auto; border: 1px solid var(--border); margin-top: 12px; }
   .fin-error { color: var(--accent); font-size: 11px; margin-top: 8px; padding: 8px; border: 1px solid var(--accent); background: rgba(230, 57, 70, 0.05); }
+
+  /* Big 3 */
+  .big-three-card { background: linear-gradient(180deg, var(--bg-card) 0%, var(--bg-elev) 100%); border-color: var(--border-bright); }
+  .big-three-item { display: grid; grid-template-columns: 28px 22px 1fr auto; gap: 12px; padding: 14px 0; border-bottom: 1px dashed var(--border); align-items: center; }
+  .big-three-item:last-child { border-bottom: none; }
+  .b3-num { font-family: 'Fraunces', serif; font-size: 24px; color: var(--gold); text-align: center; line-height: 1; }
+  .b3-check { width: 20px; height: 20px; border: 1.5px solid var(--border-bright); cursor: pointer; background: transparent; padding: 0; position: relative; }
+  .b3-check.done { background: var(--green); border-color: var(--green); }
+  .b3-check.done::after { content: '✓'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--bg); font-size: 12px; font-weight: 700; }
+  .b3-text { font-family: 'Fraunces', serif; font-size: 17px; line-height: 1.3; background: transparent; border: none; color: var(--text); padding: 4px 0; width: 100%; }
+  .b3-text:focus { outline: none; border-bottom: 1px solid var(--gold); }
+  .b3-text.done { text-decoration: line-through; color: var(--text-faint); }
+  .b3-text.empty { font-style: italic; color: var(--text-faint); }
+  .b3-del { background: none; border: none; color: var(--text-faint); cursor: pointer; font-size: 16px; opacity: 0; transition: opacity 0.15s; }
+  .big-three-item:hover .b3-del { opacity: 1; }
+  .b3-del:hover { color: var(--accent); }
+
+  /* Goals */
+  .goal-row { display: grid; grid-template-columns: auto 1fr auto auto auto; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px dashed var(--border); }
+  .goal-row:last-child { border-bottom: none; }
+  .goal-cat { font-size: 9px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gold); width: 90px; }
+  .goal-text { font-family: 'Fraunces', serif; font-size: 15px; }
+  .goal-text.done { text-decoration: line-through; color: var(--text-faint); }
+  .goal-status-toggle { background: transparent; border: 1px solid var(--border); color: var(--text-dim); padding: 4px 8px; font-size: 9px; text-transform: uppercase; letter-spacing: 0.15em; cursor: pointer; }
+  .goal-status-toggle.done { color: var(--green); border-color: var(--green); }
+
+  .okr-block { border: 1px solid var(--border); padding: 14px; margin-bottom: 10px; }
+  .okr-header { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: baseline; margin-bottom: 10px; }
+  .okr-objective { font-family: 'Fraunces', serif; font-size: 16px; }
+  .okr-goal-tag { font-size: 9px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-dim); padding: 2px 8px; border: 1px solid var(--border); }
+  .kr-row { display: grid; grid-template-columns: 1fr 70px 70px auto; gap: 8px; align-items: center; padding: 6px 0; }
+  .kr-row input { padding: 6px 8px; font-size: 12px; }
+  .kr-row .kr-name { font-size: 13px; }
+  .kr-progress-wrap { padding: 4px 0; }
+  .kr-progress { height: 4px; background: var(--border); margin-top: 4px; }
+  .kr-progress-fill { height: 100%; background: var(--gold); transition: width 0.2s; }
+  .kr-progress-fill.done { background: var(--green); }
+  .kr-meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-dim); margin-top: 2px; }
+  .kr-add-row { display: grid; grid-template-columns: 1fr 60px 60px auto; gap: 6px; margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border); }
+  .kr-add-row input { padding: 6px 8px; font-size: 12px; }
 </style>
 </head>
 <body>
@@ -404,11 +444,18 @@
 
 <nav class="tab-nav">
   <button class="tab active" data-view="dashboard" onclick="showView('dashboard')">Dashboard</button>
+  <button class="tab" data-view="goals" onclick="showView('goals')">Goals</button>
   <button class="tab" data-view="workouts" onclick="showView('workouts')">Workouts</button>
   <button class="tab" data-view="finance" onclick="showView('finance')">Finance</button>
 </nav>
 
 <div class="view" id="view-dashboard">
+
+<div class="card big-three-card" style="margin-bottom: 16px;">
+  <div class="card-label">Today <span id="b3-streak" style="color:var(--gold);margin-left:8px"></span></div>
+  <div class="card-title">Big 3 <span class="meta" id="b3-meta">0 / 0</span></div>
+  <div id="big-three-list"></div>
+</div>
 
 <div class="countdowns" id="countdowns"></div>
 
@@ -630,6 +677,47 @@
 
 </div><!-- /view-workouts -->
 
+<div class="view hidden" id="view-goals">
+
+  <div class="card" style="margin-bottom: 16px;">
+    <div class="card-label">Horizon</div>
+    <div class="card-title">Yearly Goals <span class="meta">
+      <select id="goals-year" onchange="renderGoals()"></select>
+    </span></div>
+    <div id="goals-yearly-list"></div>
+    <div class="fin-add-row" style="margin-top:12px">
+      <input type="text" id="goal-text" placeholder="Goal (e.g. lose 20 lb, hit $X net worth)">
+      <select id="goal-category">
+        <option value="health">Health</option>
+        <option value="career">Career</option>
+        <option value="finance">Finance</option>
+        <option value="relationships">Relationships</option>
+        <option value="learning">Learning</option>
+        <option value="other">Other</option>
+      </select>
+      <div></div>
+      <div></div>
+      <button class="btn btn-sm" onclick="addYearlyGoal()">Add Goal</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">Quarter</div>
+    <div class="card-title">Objectives & Key Results <span class="meta">
+      <select id="goals-quarter" onchange="renderGoals()"></select>
+    </span></div>
+    <div id="goals-objectives-list"></div>
+    <div class="fin-add-row" style="margin-top:12px">
+      <input type="text" id="obj-text" placeholder="Objective (e.g. cut to 175 lb)">
+      <select id="obj-goal"></select>
+      <div></div>
+      <div></div>
+      <button class="btn btn-sm" onclick="addObjective()">Add Objective</button>
+    </div>
+  </div>
+
+</div><!-- /view-goals -->
+
 <div class="view hidden" id="view-finance">
 
   <div class="card" style="margin-bottom: 16px;">
@@ -777,6 +865,8 @@ const firebaseConfig = {
       sessions: [], reviews: [],
       workout: { split: { name: '', days: [] }, sessions: [] },
       finance: { accounts: [], categories: [], transactions: [] },
+      bigThree: { items: [], history: {}, lastSeenDate: '' },
+      goals: { yearly: [], objectives: [] },
       lastDate: todayStr(), createdAt: todayStr()
     };
   }
@@ -794,6 +884,19 @@ const firebaseConfig = {
     if (!Array.isArray(state.finance.accounts)) state.finance.accounts = [];
     if (!Array.isArray(state.finance.categories)) state.finance.categories = [];
     if (!Array.isArray(state.finance.transactions)) state.finance.transactions = [];
+  }
+
+  function ensureBigThreeShape() {
+    if (!state.bigThree || typeof state.bigThree !== 'object') state.bigThree = { items: [], history: {}, lastSeenDate: '' };
+    if (!Array.isArray(state.bigThree.items)) state.bigThree.items = [];
+    if (!state.bigThree.history || typeof state.bigThree.history !== 'object') state.bigThree.history = {};
+    if (typeof state.bigThree.lastSeenDate !== 'string') state.bigThree.lastSeenDate = '';
+  }
+
+  function ensureGoalsShape() {
+    if (!state.goals || typeof state.goals !== 'object') state.goals = { yearly: [], objectives: [] };
+    if (!Array.isArray(state.goals.yearly)) state.goals.yearly = [];
+    if (!Array.isArray(state.goals.objectives)) state.goals.objectives = [];
   }
 
   let state = emptyState();
@@ -873,6 +976,19 @@ const firebaseConfig = {
       state.habits.forEach(h => h.doneToday = false);
       state.lastDate = today;
     }
+    applyBigThreeReset();
+  }
+
+  function applyBigThreeReset() {
+    ensureBigThreeShape();
+    const today = todayStr();
+    const last = state.bigThree.lastSeenDate;
+    if (!last) { state.bigThree.lastSeenDate = today; return; }
+    if (last < today && state.bigThree.items.length > 0) {
+      state.bigThree.history[last] = state.bigThree.items.map(i => ({ text: i.text, done: !!i.done }));
+      state.bigThree.items = state.bigThree.items.filter(i => !i.done);
+    }
+    state.bigThree.lastSeenDate = today;
   }
 
   function getHabitStreak(habit) {
@@ -3322,6 +3438,344 @@ const firebaseConfig = {
     alert(`Imported ${added} transaction${added === 1 ? '' : 's'}${skipped > 0 ? '; skipped ' + skipped : ''}.`);
   };
 
+  // BIG THREE
+  function renderBigThree() {
+    ensureBigThreeShape();
+    applyBigThreeReset();
+    const container = document.getElementById('big-three-list');
+    if (!container) return;
+    container.innerHTML = '';
+    const items = state.bigThree.items;
+
+    for (let i = 0; i < 3; i++) {
+      const item = items[i];
+      const row = document.createElement('div');
+      row.className = 'big-three-item';
+      const isDone = item && item.done;
+      const safeText = item ? escapeHtml(item.text) : '';
+      row.innerHTML = `
+        <div class="b3-num">${i + 1}</div>
+        <button class="b3-check ${isDone ? 'done' : ''}" type="button" aria-label="toggle"></button>
+        <input type="text" class="b3-text ${isDone ? 'done' : ''}"
+               placeholder="${item ? '' : 'Type a top priority…'}"
+               value="${safeText}">
+        <button class="b3-del" type="button" style="${item ? '' : 'visibility:hidden'}">×</button>
+      `;
+      const checkBtn = row.querySelector('.b3-check');
+      const textInput = row.querySelector('.b3-text');
+      const delBtn = row.querySelector('.b3-del');
+      checkBtn.onclick = () => toggleBigThreeDone(i);
+      textInput.onchange = () => setBigThreeText(i, textInput.value);
+      textInput.onkeydown = (e) => { if (e.key === 'Enter') textInput.blur(); };
+      delBtn.onclick = () => deleteBigThree(i);
+      container.appendChild(row);
+    }
+
+    const done = items.filter(i => i.done).length;
+    document.getElementById('b3-meta').textContent = `${done} / ${items.length}`;
+
+    const streak = computeBigThreeStreak();
+    const streakEl = document.getElementById('b3-streak');
+    streakEl.textContent = streak > 0 ? `· ${streak}-day streak` : '';
+  }
+
+  function toggleBigThreeDone(idx) {
+    const item = state.bigThree.items[idx];
+    if (!item) return;
+    item.done = !item.done;
+    debouncedSave();
+    renderBigThree();
+  }
+
+  function setBigThreeText(idx, text) {
+    const trimmed = text.trim();
+    const item = state.bigThree.items[idx];
+    if (item) {
+      if (trimmed) item.text = trimmed;
+      else state.bigThree.items.splice(idx, 1);
+    } else if (trimmed) {
+      state.bigThree.items.push({ id: uid(), text: trimmed, done: false, createdAt: todayStr() });
+    }
+    debouncedSave();
+    renderBigThree();
+  }
+
+  function deleteBigThree(idx) {
+    state.bigThree.items.splice(idx, 1);
+    debouncedSave();
+    renderBigThree();
+  }
+
+  function computeBigThreeStreak() {
+    let streak = 0;
+    const d = new Date(todayStr() + 'T00:00:00');
+    for (let i = 1; i < 365; i++) {
+      d.setDate(d.getDate() - 1);
+      const dayStr = localDateStr(d);
+      const record = state.bigThree.history[dayStr];
+      if (!record || record.length === 0) break;
+      const allDone = record.every(r => r.done);
+      if (!allDone) break;
+      streak++;
+    }
+    return streak;
+  }
+
+  // GOALS
+  function renderGoals() {
+    ensureGoalsShape();
+    const yearSelect = document.getElementById('goals-year');
+    const quarterSelect = document.getElementById('goals-quarter');
+    if (!yearSelect || !quarterSelect) return;
+
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentQuarter = Math.floor(today.getMonth() / 3) + 1;
+
+    const years = new Set([currentYear, currentYear + 1]);
+    state.goals.yearly.forEach(g => years.add(g.year));
+    state.goals.objectives.forEach(o => {
+      const y = parseInt((o.quarter || '').split('-Q')[0], 10);
+      if (Number.isFinite(y)) years.add(y);
+    });
+    const sortedYears = [...years].sort((a, b) => b - a);
+    const prevYear = yearSelect.value;
+    yearSelect.innerHTML = sortedYears.map(y => `<option value="${y}">${y}</option>`).join('');
+    yearSelect.value = prevYear && sortedYears.includes(parseInt(prevYear, 10)) ? prevYear : String(currentYear);
+
+    const selectedYear = parseInt(yearSelect.value, 10);
+    const prevQuarter = quarterSelect.value;
+    const quarters = [`${selectedYear}-Q1`, `${selectedYear}-Q2`, `${selectedYear}-Q3`, `${selectedYear}-Q4`];
+    quarterSelect.innerHTML = quarters.map(q => `<option value="${q}">${q}</option>`).join('');
+    quarterSelect.value = quarters.includes(prevQuarter) ? prevQuarter : `${selectedYear}-Q${selectedYear === currentYear ? currentQuarter : 1}`;
+
+    renderYearlyGoals(selectedYear);
+    renderObjectives(quarterSelect.value, selectedYear);
+  }
+
+  function renderYearlyGoals(year) {
+    const list = document.getElementById('goals-yearly-list');
+    if (!list) return;
+    list.innerHTML = '';
+    const goals = state.goals.yearly.filter(g => g.year === year);
+    if (goals.length === 0) {
+      list.innerHTML = `<div class="empty" style="padding:12px">No yearly goals for ${year}.</div>`;
+      return;
+    }
+    goals.forEach(g => {
+      const row = document.createElement('div');
+      row.className = 'goal-row';
+      const doneCls = g.status === 'done' ? ' done' : '';
+      row.innerHTML = `
+        <span class="goal-cat">${escapeHtml(g.category || 'other')}</span>
+        <span class="goal-text${doneCls}">${escapeHtml(g.text)}</span>
+        <button class="goal-status-toggle ${g.status === 'done' ? 'done' : ''}" type="button">${g.status === 'done' ? '✓ done' : 'mark done'}</button>
+        <button class="set-add edit-goal" type="button">edit</button>
+        <button class="task-del del-goal" type="button">×</button>
+      `;
+      row.querySelector('.goal-status-toggle').onclick = () => toggleGoalStatus(g.id);
+      row.querySelector('.edit-goal').onclick = () => editGoal(g.id);
+      row.querySelector('.del-goal').onclick = () => deleteGoal(g.id);
+      list.appendChild(row);
+    });
+  }
+
+  function renderObjectives(quarter, year) {
+    const list = document.getElementById('goals-objectives-list');
+    if (!list) return;
+    list.innerHTML = '';
+    const objs = state.goals.objectives.filter(o => o.quarter === quarter);
+
+    const goalSelect = document.getElementById('obj-goal');
+    const yearGoals = state.goals.yearly.filter(g => g.year === year);
+    goalSelect.innerHTML = '<option value="">— no goal link —</option>'
+      + yearGoals.map(g => `<option value="${g.id}">${escapeHtml(g.text.slice(0, 50))}</option>`).join('');
+
+    if (objs.length === 0) {
+      list.innerHTML = `<div class="empty" style="padding:12px">No objectives for ${quarter}.</div>`;
+      return;
+    }
+    objs.forEach(o => {
+      const goal = state.goals.yearly.find(g => g.id === o.goalId);
+      const card = document.createElement('div');
+      card.className = 'okr-block';
+      card.innerHTML = `
+        <div class="okr-header">
+          <div>
+            <div class="okr-objective">${escapeHtml(o.text)}</div>
+            ${goal ? `<span class="okr-goal-tag">${escapeHtml(goal.text.slice(0, 50))}</span>` : ''}
+          </div>
+          <button class="set-add edit-obj" type="button">edit</button>
+          <button class="task-del del-obj" type="button">×</button>
+        </div>
+        <div class="kr-list"></div>
+        <div class="kr-add-row">
+          <input type="text" class="kr-text" placeholder="Key result (e.g. weigh 175 lb)">
+          <input type="number" step="0.1" class="kr-current" placeholder="now">
+          <input type="number" step="0.1" class="kr-target" placeholder="target">
+          <button class="btn btn-sm kr-add-btn" type="button">+ KR</button>
+        </div>
+      `;
+      const krList = card.querySelector('.kr-list');
+      (o.keyResults || []).forEach(kr => krList.appendChild(buildKRRow(o.id, kr)));
+
+      card.querySelector('.edit-obj').onclick = () => editObjective(o.id);
+      card.querySelector('.del-obj').onclick = () => deleteObjective(o.id);
+      card.querySelector('.kr-add-btn').onclick = () => {
+        const text = card.querySelector('.kr-text').value.trim();
+        if (!text) return;
+        const currentRaw = card.querySelector('.kr-current').value;
+        const targetRaw = card.querySelector('.kr-target').value;
+        const current = currentRaw === '' ? null : Number(currentRaw);
+        const target = targetRaw === '' ? null : Number(targetRaw);
+        addKR(o.id, { text, current, target });
+      };
+
+      list.appendChild(card);
+    });
+  }
+
+  function buildKRRow(objId, kr) {
+    const row = document.createElement('div');
+    row.className = 'kr-row';
+    const hasNum = Number.isFinite(kr.target) && kr.target !== null;
+    const cur = Number.isFinite(kr.current) ? kr.current : 0;
+    const pct = hasNum && kr.target !== 0
+      ? Math.min(100, Math.max(0, (cur / kr.target) * 100))
+      : (kr.done ? 100 : 0);
+    const done = hasNum ? pct >= 100 : !!kr.done;
+    row.innerHTML = `
+      <div class="kr-progress-wrap">
+        <div class="kr-name">${escapeHtml(kr.text)}</div>
+        <div class="kr-meta">${hasNum ? `${cur} / ${kr.target}` : (kr.done ? 'done' : 'open')} · ${Math.round(pct)}%</div>
+        <div class="kr-progress"><div class="kr-progress-fill ${done ? 'done' : ''}" style="width:${pct}%"></div></div>
+      </div>
+      ${hasNum
+        ? `<input type="number" step="0.1" value="${cur}" class="kr-current-edit" placeholder="now"><input type="number" step="0.1" value="${kr.target}" class="kr-target-edit" placeholder="target">`
+        : `<button class="goal-status-toggle ${done ? 'done' : ''}" type="button" data-act="toggle">${done ? '✓ done' : 'mark done'}</button><div></div>`}
+      <button class="task-del del-kr" type="button">×</button>
+    `;
+    if (hasNum) {
+      const curIn = row.querySelector('.kr-current-edit');
+      const tarIn = row.querySelector('.kr-target-edit');
+      curIn.onchange = () => updateKR(objId, kr.id, { current: curIn.value === '' ? null : Number(curIn.value) });
+      tarIn.onchange = () => updateKR(objId, kr.id, { target: tarIn.value === '' ? null : Number(tarIn.value) });
+    } else {
+      row.querySelector('[data-act="toggle"]').onclick = () => updateKR(objId, kr.id, { done: !kr.done });
+    }
+    row.querySelector('.del-kr').onclick = () => deleteKR(objId, kr.id);
+    return row;
+  }
+
+  window.addYearlyGoal = () => {
+    const text = document.getElementById('goal-text').value.trim();
+    const category = document.getElementById('goal-category').value;
+    if (!text) return;
+    const year = parseInt(document.getElementById('goals-year').value, 10) || new Date().getFullYear();
+    state.goals.yearly.push({ id: uid(), year, text, category, status: 'active', createdAt: todayStr() });
+    document.getElementById('goal-text').value = '';
+    debouncedSave();
+    renderGoals();
+  };
+
+  window.editGoal = (id) => {
+    const g = state.goals.yearly.find(x => x.id === id);
+    if (!g) return;
+    const newText = prompt('Goal:', g.text);
+    if (newText == null) return;
+    if (newText.trim()) g.text = newText.trim();
+    debouncedSave();
+    renderGoals();
+  };
+
+  window.toggleGoalStatus = (id) => {
+    const g = state.goals.yearly.find(x => x.id === id);
+    if (!g) return;
+    g.status = g.status === 'done' ? 'active' : 'done';
+    debouncedSave();
+    renderGoals();
+  };
+
+  window.deleteGoal = (id) => {
+    const g = state.goals.yearly.find(x => x.id === id);
+    if (!g) return;
+    const objCount = state.goals.objectives.filter(o => o.goalId === id).length;
+    const msg = objCount > 0
+      ? `"${g.text}" has ${objCount} linked objectives. Delete goal (objectives become unlinked)?`
+      : `Delete goal "${g.text}"?`;
+    if (!confirm(msg)) return;
+    state.goals.yearly = state.goals.yearly.filter(x => x.id !== id);
+    state.goals.objectives.forEach(o => { if (o.goalId === id) o.goalId = null; });
+    debouncedSave();
+    renderGoals();
+  };
+
+  window.addObjective = () => {
+    const text = document.getElementById('obj-text').value.trim();
+    const goalId = document.getElementById('obj-goal').value || null;
+    const quarter = document.getElementById('goals-quarter').value;
+    if (!text || !quarter) return;
+    state.goals.objectives.push({
+      id: uid(), goalId, quarter, text,
+      status: 'active', keyResults: [], createdAt: todayStr()
+    });
+    document.getElementById('obj-text').value = '';
+    debouncedSave();
+    renderGoals();
+  };
+
+  window.editObjective = (id) => {
+    const o = state.goals.objectives.find(x => x.id === id);
+    if (!o) return;
+    const newText = prompt('Objective:', o.text);
+    if (newText == null) return;
+    if (newText.trim()) o.text = newText.trim();
+    debouncedSave();
+    renderGoals();
+  };
+
+  window.deleteObjective = (id) => {
+    const o = state.goals.objectives.find(x => x.id === id);
+    if (!o) return;
+    if (!confirm(`Delete objective "${o.text}"?`)) return;
+    state.goals.objectives = state.goals.objectives.filter(x => x.id !== id);
+    debouncedSave();
+    renderGoals();
+  };
+
+  function addKR(objId, kr) {
+    const o = state.goals.objectives.find(x => x.id === objId);
+    if (!o) return;
+    if (!Array.isArray(o.keyResults)) o.keyResults = [];
+    o.keyResults.push({
+      id: uid(),
+      text: kr.text,
+      current: kr.current,
+      target: kr.target,
+      done: false
+    });
+    debouncedSave();
+    renderGoals();
+  }
+
+  function updateKR(objId, krId, patch) {
+    const o = state.goals.objectives.find(x => x.id === objId);
+    if (!o) return;
+    const kr = (o.keyResults || []).find(x => x.id === krId);
+    if (!kr) return;
+    Object.assign(kr, patch);
+    debouncedSave();
+    renderGoals();
+  }
+
+  function deleteKR(objId, krId) {
+    const o = state.goals.objectives.find(x => x.id === objId);
+    if (!o) return;
+    o.keyResults = (o.keyResults || []).filter(x => x.id !== krId);
+    debouncedSave();
+    renderGoals();
+  }
+
   // EXPORT
   window.exportData = () => {
     const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
@@ -3388,6 +3842,8 @@ const firebaseConfig = {
         if (state.categories.length === 0) state.categories = ['General'];
         ensureWorkoutShape();
         ensureFinanceShape();
+        ensureBigThreeShape();
+        ensureGoalsShape();
         applyDailyResets();
         await setDoc(userDocRef, state);
       } else {
@@ -3407,6 +3863,8 @@ const firebaseConfig = {
           if (state.categories.length === 0) state.categories = ['General'];
           ensureWorkoutShape();
           ensureFinanceShape();
+          ensureBigThreeShape();
+          ensureGoalsShape();
           renderAll();
         }
       });
@@ -3442,6 +3900,8 @@ const firebaseConfig = {
     renderReviews();
     renderWorkout();
     renderFinance();
+    renderBigThree();
+    renderGoals();
   }
 
   async function init() {
