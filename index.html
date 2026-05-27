@@ -305,6 +305,66 @@
   .upload-row { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
   .json-textarea { width: 100%; min-height: 160px; font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 10px; background: var(--bg); color: var(--text); border: 1px solid var(--border); }
   .workout-error { color: var(--accent); font-size: 11px; margin-top: 8px; white-space: pre-wrap; padding: 8px; border: 1px solid var(--accent); background: rgba(230, 57, 70, 0.05); }
+
+  /* Finance */
+  .fin-net-worth { font-family: 'Fraunces', serif; font-size: 36px; font-weight: 400; line-height: 1; }
+  .fin-net-worth .delta { font-family: 'JetBrains Mono', monospace; font-size: 12px; margin-left: 10px; color: var(--text-dim); letter-spacing: 0.05em; }
+  .fin-net-worth .delta.up { color: var(--green); }
+  .fin-net-worth .delta.down { color: var(--accent); }
+  .fin-month-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px; margin-bottom: 12px; }
+  .fin-month-tile { border: 1px solid var(--border); padding: 12px; }
+  .fin-month-tile .label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--text-dim); margin-bottom: 6px; }
+  .fin-month-tile .val { font-family: 'Fraunces', serif; font-size: 20px; }
+  .fin-month-tile .val.income { color: var(--green); }
+  .fin-month-tile .val.expense { color: var(--accent); }
+
+  .fin-quick-add { display: grid; grid-template-columns: 100px 100px 1fr 1fr 1fr auto; gap: 6px; margin-bottom: 12px; align-items: center; }
+  @media (max-width: 900px) { .fin-quick-add { grid-template-columns: 1fr 1fr; } .fin-quick-add > button { grid-column: span 2; } }
+  .fin-quick-add input, .fin-quick-add select { padding: 8px 10px; font-size: 12px; }
+  .fin-type-pills { display: inline-flex; border: 1px solid var(--border); }
+  .fin-type-pills button { background: transparent; border: none; color: var(--text-dim); padding: 8px 12px; font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; cursor: pointer; border-right: 1px solid var(--border); }
+  .fin-type-pills button:last-child { border-right: none; }
+  .fin-type-pills button.active { background: var(--gold); color: var(--bg); }
+
+  .fin-account-list { display: grid; gap: 8px; }
+  .fin-account-row { display: grid; grid-template-columns: 1fr 90px 1fr auto auto; gap: 8px; align-items: center; padding: 8px 0; border-bottom: 1px dashed var(--border); }
+  .fin-account-row:last-child { border-bottom: none; }
+  .fin-account-row .name { font-size: 13px; }
+  .fin-account-row .type { font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.15em; }
+  .fin-account-row .bal { font-family: 'Fraunces', serif; font-size: 16px; text-align: right; }
+  .fin-account-row .bal.neg { color: var(--accent); }
+  .fin-account-row .bal.liab { color: var(--gold); }
+
+  .fin-category-row { display: grid; grid-template-columns: 1fr 80px 1fr auto; gap: 8px; align-items: center; padding: 8px 0; border-bottom: 1px dashed var(--border); }
+  .fin-category-row:last-child { border-bottom: none; }
+  .fin-budget-bar { width: 100%; height: 6px; background: var(--border); position: relative; overflow: hidden; }
+  .fin-budget-fill { height: 100%; background: var(--gold); transition: width 0.2s; }
+  .fin-budget-fill.over { background: var(--accent); }
+  .fin-budget-fill.ok { background: var(--green); }
+  .fin-budget-meta { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-dim); margin-top: 4px; font-family: 'JetBrains Mono', monospace; }
+
+  .fin-tx-list { max-height: 480px; overflow-y: auto; }
+  .fin-tx-row { display: grid; grid-template-columns: 80px 80px 1fr 1fr 90px auto; gap: 10px; align-items: baseline; padding: 8px 0; border-bottom: 1px dashed var(--border); font-size: 12px; }
+  .fin-tx-row .date { color: var(--gold); font-size: 11px; }
+  .fin-tx-row .type-tag { font-size: 9px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-dim); }
+  .fin-tx-row .amount { font-family: 'Fraunces', serif; font-size: 14px; text-align: right; }
+  .fin-tx-row .amount.income { color: var(--green); }
+  .fin-tx-row .amount.expense { color: var(--accent); }
+  .fin-tx-row .uncat { color: var(--gold); font-style: italic; }
+
+  .fin-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; align-items: center; }
+  .fin-filters select, .fin-filters input { padding: 6px 8px; font-size: 11px; max-width: 180px; }
+
+  .fin-add-row { display: grid; grid-template-columns: 1fr 110px 110px 90px auto; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border); align-items: center; }
+  @media (max-width: 700px) { .fin-add-row { grid-template-columns: 1fr 1fr; } .fin-add-row > button { grid-column: span 2; } }
+  .fin-add-row input, .fin-add-row select { padding: 8px 10px; font-size: 12px; }
+
+  .fin-csv-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 11px; }
+  .fin-csv-table th { text-align: left; padding: 6px 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; font-size: 10px; border-bottom: 1px solid var(--border); }
+  .fin-csv-table td { padding: 4px 8px; border-bottom: 1px dashed var(--border); color: var(--text); }
+  .fin-csv-table select { padding: 4px 6px; font-size: 10px; }
+  .fin-csv-preview { max-height: 240px; overflow-y: auto; border: 1px solid var(--border); margin-top: 12px; }
+  .fin-error { color: var(--accent); font-size: 11px; margin-top: 8px; padding: 8px; border: 1px solid var(--accent); background: rgba(230, 57, 70, 0.05); }
 </style>
 </head>
 <body>
@@ -345,6 +405,7 @@
 <nav class="tab-nav">
   <button class="tab active" data-view="dashboard" onclick="showView('dashboard')">Dashboard</button>
   <button class="tab" data-view="workouts" onclick="showView('workouts')">Workouts</button>
+  <button class="tab" data-view="finance" onclick="showView('finance')">Finance</button>
 </nav>
 
 <div class="view" id="view-dashboard">
@@ -569,6 +630,99 @@
 
 </div><!-- /view-workouts -->
 
+<div class="view hidden" id="view-finance">
+
+  <div class="card" style="margin-bottom: 16px;">
+    <div class="card-label">Snapshot</div>
+    <div class="card-title">Net Worth <span class="meta" id="fin-month-label">—</span></div>
+    <div class="fin-net-worth"><span id="fin-net-worth-val">$0</span><span class="delta" id="fin-net-worth-delta"></span></div>
+    <div class="fin-month-row">
+      <div class="fin-month-tile"><div class="label">Income (mo)</div><div class="val income" id="fin-month-income">$0</div></div>
+      <div class="fin-month-tile"><div class="label">Expenses (mo)</div><div class="val expense" id="fin-month-expense">$0</div></div>
+      <div class="fin-month-tile"><div class="label">Net (mo)</div><div class="val" id="fin-month-net">$0</div></div>
+    </div>
+    <div class="progress-chart" id="fin-nw-chart" style="height: 180px;"></div>
+  </div>
+
+  <div class="card" style="margin-bottom: 16px;">
+    <div class="card-label">Log</div>
+    <div class="card-title">Quick Add</div>
+    <div style="margin-bottom: 10px;">
+      <div class="fin-type-pills" id="fin-type-pills">
+        <button data-type="expense" class="active">Expense</button>
+        <button data-type="income">Income</button>
+        <button data-type="transfer">Transfer</button>
+      </div>
+    </div>
+    <div class="fin-quick-add">
+      <input type="date" id="fin-tx-date">
+      <input type="number" step="0.01" id="fin-tx-amount" placeholder="$ amount" inputmode="decimal">
+      <select id="fin-tx-account"></select>
+      <select id="fin-tx-to-account" style="display:none"></select>
+      <select id="fin-tx-category"></select>
+      <input type="text" id="fin-tx-note" placeholder="Note (optional)">
+      <button class="btn btn-sm" onclick="addFinanceTransaction()">Add</button>
+    </div>
+    <div id="fin-quick-error" class="fin-error hidden"></div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-label">Hold</div>
+      <div class="card-title">Accounts</div>
+      <div class="fin-account-list" id="fin-accounts-list"></div>
+      <div class="fin-add-row">
+        <input type="text" id="fin-acct-name" placeholder="Account name">
+        <select id="fin-acct-type">
+          <option value="checking">Checking</option>
+          <option value="savings">Savings</option>
+          <option value="credit">Credit Card</option>
+          <option value="investment">Investment</option>
+          <option value="cash">Cash</option>
+        </select>
+        <input type="number" step="0.01" id="fin-acct-balance" placeholder="Starting $">
+        <div></div>
+        <button class="btn btn-sm" onclick="addFinanceAccount()">Add</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Cap</div>
+      <div class="card-title">Categories & Budget</div>
+      <div id="fin-categories-list"></div>
+      <div class="fin-add-row">
+        <input type="text" id="fin-cat-name" placeholder="Category name">
+        <select id="fin-cat-type">
+          <option value="expense">Expense</option>
+          <option value="income">Income</option>
+        </select>
+        <input type="number" step="1" id="fin-cat-cap" placeholder="Monthly cap $">
+        <div></div>
+        <button class="btn btn-sm" onclick="addFinanceCategory()">Add</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top: 16px;">
+    <div class="card-label">Log</div>
+    <div class="card-title">Transactions <span class="meta" id="fin-tx-count">0</span></div>
+    <div class="fin-filters">
+      <select id="fin-filter-account"><option value="">All accounts</option></select>
+      <select id="fin-filter-category"><option value="">All categories</option></select>
+      <select id="fin-filter-type">
+        <option value="">All types</option>
+        <option value="expense">Expense</option>
+        <option value="income">Income</option>
+        <option value="transfer">Transfer</option>
+      </select>
+      <input type="text" id="fin-filter-search" placeholder="Search note...">
+      <button class="btn btn-sm btn-secondary" onclick="openCsvImport()">Import CSV</button>
+    </div>
+    <div class="fin-tx-list" id="fin-tx-list"></div>
+  </div>
+
+</div><!-- /view-finance -->
+
 <footer class="footer">
   <span id="user-email">—</span>
   <span>Saved · <span id="last-saved">—</span></span>
@@ -622,6 +776,7 @@ const firebaseConfig = {
       habitHistory: {}, schedule: [], countdowns: [],
       sessions: [], reviews: [],
       workout: { split: { name: '', days: [] }, sessions: [] },
+      finance: { accounts: [], categories: [], transactions: [] },
       lastDate: todayStr(), createdAt: todayStr()
     };
   }
@@ -632,6 +787,13 @@ const firebaseConfig = {
     if (typeof state.workout.split.name !== 'string') state.workout.split.name = '';
     if (!Array.isArray(state.workout.split.days)) state.workout.split.days = [];
     if (!Array.isArray(state.workout.sessions)) state.workout.sessions = [];
+  }
+
+  function ensureFinanceShape() {
+    if (!state.finance || typeof state.finance !== 'object') state.finance = { accounts: [], categories: [], transactions: [] };
+    if (!Array.isArray(state.finance.accounts)) state.finance.accounts = [];
+    if (!Array.isArray(state.finance.categories)) state.finance.categories = [];
+    if (!Array.isArray(state.finance.transactions)) state.finance.transactions = [];
   }
 
   let state = emptyState();
@@ -2518,6 +2680,648 @@ const firebaseConfig = {
     `).join('');
   }
 
+  // FINANCE
+  const FIN_ACCOUNT_TYPES = { checking:'Checking', savings:'Savings', credit:'Credit', investment:'Investment', cash:'Cash' };
+  let financeAddType = 'expense';
+  let financeCsvData = null;
+
+  function fmtMoney(n, opts = {}) {
+    const num = Number(n) || 0;
+    const sign = num < 0 ? '-' : (opts.plus && num > 0 ? '+' : '');
+    const abs = Math.abs(num);
+    const decimals = opts.decimals != null ? opts.decimals : (abs < 100 ? 2 : 0);
+    return sign + '$' + abs.toLocaleString('en-US', { maximumFractionDigits: 2, minimumFractionDigits: decimals });
+  }
+
+  function accountIsLiability(a) { return a && a.type === 'credit'; }
+
+  function computeAccountBalance(account, asOfDate) {
+    let bal = Number(account.startingBalance) || 0;
+    for (const t of state.finance.transactions) {
+      if (asOfDate && t.date > asOfDate) continue;
+      const amt = Number(t.amount) || 0;
+      if (t.type === 'expense' && t.accountId === account.id) {
+        bal += accountIsLiability(account) ? amt : -amt;
+      } else if (t.type === 'income' && t.accountId === account.id) {
+        bal += accountIsLiability(account) ? -amt : amt;
+      } else if (t.type === 'transfer') {
+        if (t.accountId === account.id) bal += accountIsLiability(account) ? amt : -amt;
+        if (t.toAccountId === account.id) bal += accountIsLiability(account) ? -amt : amt;
+      }
+    }
+    return bal;
+  }
+
+  function computeNetWorth(asOfDate) {
+    return state.finance.accounts.filter(a => !a.archived).reduce((sum, a) => {
+      const b = computeAccountBalance(a, asOfDate);
+      return sum + (accountIsLiability(a) ? -b : b);
+    }, 0);
+  }
+
+  function monthKey(d) { return d.slice(0, 7); }
+  function getThisMonthKey() { return todayStr().slice(0, 7); }
+
+  function getMonthCategoryTotal(categoryId, monthYearKey, txType) {
+    return state.finance.transactions
+      .filter(t => t.type === txType && t.categoryId === categoryId && monthKey(t.date) === monthYearKey)
+      .reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
+  }
+
+  function renderFinance() {
+    ensureFinanceShape();
+    if (!document.getElementById('view-finance')) return;
+    renderFinanceQuickAdd();
+    renderFinanceAccounts();
+    renderFinanceCategories();
+    renderFinanceTransactions();
+    renderFinanceSnapshot();
+  }
+
+  function renderFinanceSnapshot() {
+    const nw = computeNetWorth();
+    document.getElementById('fin-net-worth-val').textContent = fmtMoney(nw, { decimals: 2 });
+
+    const today = new Date();
+    const lastMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0);
+    const lastMonthEndStr = lastMonthEnd.toISOString().slice(0, 10);
+    const lastNw = computeNetWorth(lastMonthEndStr);
+    const delta = nw - lastNw;
+    const deltaEl = document.getElementById('fin-net-worth-delta');
+    if (state.finance.transactions.length === 0 && state.finance.accounts.length === 0) {
+      deltaEl.textContent = '';
+      deltaEl.className = 'delta';
+    } else {
+      deltaEl.textContent = fmtMoney(delta, { plus: true, decimals: 0 }) + ' MoM';
+      deltaEl.className = 'delta ' + (delta > 0 ? 'up' : (delta < 0 ? 'down' : ''));
+    }
+
+    const thisMo = getThisMonthKey();
+    let income = 0, expense = 0;
+    state.finance.transactions.forEach(t => {
+      if (monthKey(t.date) !== thisMo) return;
+      if (t.type === 'income') income += Number(t.amount) || 0;
+      else if (t.type === 'expense') expense += Number(t.amount) || 0;
+    });
+    document.getElementById('fin-month-income').textContent = fmtMoney(income, { decimals: 0 });
+    document.getElementById('fin-month-expense').textContent = fmtMoney(expense, { decimals: 0 });
+    const net = income - expense;
+    const netEl = document.getElementById('fin-month-net');
+    netEl.textContent = fmtMoney(net, { plus: true, decimals: 0 });
+    netEl.style.color = net > 0 ? 'var(--green)' : (net < 0 ? 'var(--accent)' : 'var(--text)');
+
+    document.getElementById('fin-month-label').textContent = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+    drawNetWorthChart();
+  }
+
+  function drawNetWorthChart() {
+    const container = document.getElementById('fin-nw-chart');
+    if (!container) return;
+    if (state.finance.transactions.length === 0 && state.finance.accounts.length === 0) {
+      container.innerHTML = '<div class="empty" style="padding: 16px;">Add accounts and transactions to see your net worth trend.</div>';
+      return;
+    }
+    const today = new Date();
+    const points = [];
+    for (let i = 11; i >= 0; i--) {
+      const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+      const lastDay = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+      const asOf = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+      points.push({ label: d.toLocaleDateString('en-US', { month: 'short' }), value: computeNetWorth(asOf) });
+    }
+    points[points.length - 1] = { label: 'Now', value: computeNetWorth() };
+
+    const w = 700, h = 180, padLeft = 56, padRight = 16, padTop = 12, padBottom = 26;
+    const innerW = w - padLeft - padRight;
+    const innerH = h - padTop - padBottom;
+    const vals = points.map(p => p.value);
+    const min = Math.min(...vals, 0);
+    const max = Math.max(...vals, 0);
+    const range = (max - min) || 100;
+    const yMin = min - range * 0.05;
+    const yMax = max + range * 0.05;
+    const yRange = yMax - yMin || 1;
+    const xFor = i => padLeft + (i / (points.length - 1)) * innerW;
+    const yFor = v => padTop + innerH - ((v - yMin) / yRange) * innerH;
+
+    const pathD = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${xFor(i)} ${yFor(p.value)}`).join(' ');
+    const yTicks = [];
+    for (let i = 0; i <= 3; i++) {
+      const v = yMin + (yRange * i / 3);
+      yTicks.push({ y: yFor(v), label: fmtMoney(v, { decimals: 0 }) });
+    }
+    const grid = yTicks.map(t => `<line class="chart-grid" x1="${padLeft}" y1="${t.y}" x2="${w - padRight}" y2="${t.y}"/>`).join('');
+    const yLabels = yTicks.map(t => `<text class="chart-text y" x="${padLeft - 6}" y="${t.y + 3}">${t.label}</text>`).join('');
+    const xLabels = points.map((p, i) => `<text class="chart-text x" x="${xFor(i)}" y="${h - padBottom + 14}">${p.label}</text>`).join('');
+    const dots = points.map((p, i) => `<circle cx="${xFor(i)}" cy="${yFor(p.value)}" r="2.5" class="chart-dot"><title>${p.label}: ${fmtMoney(p.value, { decimals: 0 })}</title></circle>`).join('');
+    const areaD = `${pathD} L ${xFor(points.length - 1)} ${h - padBottom} L ${padLeft} ${h - padBottom} Z`;
+
+    container.innerHTML = `
+      <svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet" style="width:100%;height:100%">
+        ${grid}
+        <line class="chart-axis" x1="${padLeft}" y1="${padTop}" x2="${padLeft}" y2="${h - padBottom}"/>
+        <line class="chart-axis" x1="${padLeft}" y1="${h - padBottom}" x2="${w - padRight}" y2="${h - padBottom}"/>
+        ${yLabels}
+        ${xLabels}
+        <path d="${areaD}" class="chart-area"/>
+        <path d="${pathD}" class="chart-line"/>
+        ${dots}
+      </svg>
+    `;
+  }
+
+  function renderFinanceQuickAdd() {
+    document.querySelectorAll('#fin-type-pills button').forEach(p => {
+      p.classList.toggle('active', p.dataset.type === financeAddType);
+      p.onclick = () => { financeAddType = p.dataset.type; renderFinanceQuickAdd(); };
+    });
+
+    const dateInput = document.getElementById('fin-tx-date');
+    if (dateInput && !dateInput.value) dateInput.value = todayStr();
+
+    const acctSel = document.getElementById('fin-tx-account');
+    const toAcctSel = document.getElementById('fin-tx-to-account');
+    const catSel = document.getElementById('fin-tx-category');
+
+    const accounts = state.finance.accounts.filter(a => !a.archived);
+    const acctOpts = accounts.map(a => `<option value="${a.id}">${escapeHtml(a.name)}</option>`).join('');
+    acctSel.innerHTML = '<option value="">— account —</option>' + acctOpts;
+    toAcctSel.innerHTML = '<option value="">— to account —</option>' + acctOpts;
+
+    const wantedType = financeAddType === 'income' ? 'income' : 'expense';
+    const cats = state.finance.categories.filter(c => c.type === wantedType);
+    catSel.innerHTML = '<option value="">— category —</option>' + cats.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+
+    if (financeAddType === 'transfer') {
+      toAcctSel.style.display = '';
+      catSel.style.display = 'none';
+    } else {
+      toAcctSel.style.display = 'none';
+      catSel.style.display = '';
+    }
+  }
+
+  window.addFinanceTransaction = () => {
+    const errEl = document.getElementById('fin-quick-error');
+    errEl.classList.add('hidden'); errEl.textContent = '';
+
+    const date = document.getElementById('fin-tx-date').value || todayStr();
+    const amount = Number(document.getElementById('fin-tx-amount').value);
+    const accountId = document.getElementById('fin-tx-account').value;
+    const toAccountId = document.getElementById('fin-tx-to-account').value;
+    const categoryId = document.getElementById('fin-tx-category').value;
+    const note = document.getElementById('fin-tx-note').value.trim();
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+      errEl.textContent = 'Amount must be a positive number.';
+      errEl.classList.remove('hidden'); return;
+    }
+    if (!accountId) {
+      errEl.textContent = 'Pick an account.';
+      errEl.classList.remove('hidden'); return;
+    }
+    if (financeAddType === 'transfer' && !toAccountId) {
+      errEl.textContent = 'Pick a destination account.';
+      errEl.classList.remove('hidden'); return;
+    }
+    if (financeAddType === 'transfer' && toAccountId === accountId) {
+      errEl.textContent = 'From and to account must differ.';
+      errEl.classList.remove('hidden'); return;
+    }
+
+    const tx = { id: uid(), date, amount: Math.abs(amount), type: financeAddType, accountId, note };
+    if (financeAddType === 'transfer') tx.toAccountId = toAccountId;
+    else tx.categoryId = categoryId || null;
+
+    state.finance.transactions.push(tx);
+    debouncedSave();
+    document.getElementById('fin-tx-amount').value = '';
+    document.getElementById('fin-tx-note').value = '';
+    renderFinance();
+  };
+
+  function renderFinanceAccounts() {
+    const list = document.getElementById('fin-accounts-list');
+    if (!list) return;
+    list.innerHTML = '';
+    if (state.finance.accounts.length === 0) {
+      list.innerHTML = '<div class="empty" style="padding: 12px;">No accounts yet. Add one below.</div>';
+    }
+    state.finance.accounts.forEach(a => {
+      const bal = computeAccountBalance(a);
+      const isLiab = accountIsLiability(a);
+      const balClass = isLiab ? 'bal liab' : (bal < 0 ? 'bal neg' : 'bal');
+      const row = document.createElement('div');
+      row.className = 'fin-account-row';
+      row.innerHTML = `
+        <span class="name">${escapeHtml(a.name)}</span>
+        <span class="type">${FIN_ACCOUNT_TYPES[a.type] || a.type}</span>
+        <span class="${balClass}">${fmtMoney(bal, { decimals: 2 })}${isLiab ? ' owed' : ''}</span>
+        <button class="set-add edit-acct">edit</button>
+        <button class="task-del del-acct">×</button>
+      `;
+      row.querySelector('.edit-acct').onclick = () => editFinanceAccount(a.id);
+      row.querySelector('.del-acct').onclick = () => deleteFinanceAccount(a.id);
+      list.appendChild(row);
+    });
+  }
+
+  window.addFinanceAccount = () => {
+    const name = document.getElementById('fin-acct-name').value.trim();
+    const type = document.getElementById('fin-acct-type').value;
+    const balRaw = document.getElementById('fin-acct-balance').value;
+    const startingBalance = balRaw === '' ? 0 : Number(balRaw);
+    if (!name) return;
+    state.finance.accounts.push({
+      id: uid(), name, type,
+      startingBalance: Number.isFinite(startingBalance) ? startingBalance : 0,
+      archived: false
+    });
+    document.getElementById('fin-acct-name').value = '';
+    document.getElementById('fin-acct-balance').value = '';
+    debouncedSave();
+    renderFinance();
+  };
+
+  window.editFinanceAccount = (id) => {
+    const a = state.finance.accounts.find(x => x.id === id);
+    if (!a) return;
+    const newName = prompt('Account name:', a.name);
+    if (newName == null) return;
+    const newBalRaw = prompt(accountIsLiability(a) ? 'Starting debt ($):' : 'Starting balance ($):', String(a.startingBalance || 0));
+    if (newBalRaw == null) return;
+    const newBal = Number(newBalRaw);
+    a.name = newName.trim() || a.name;
+    if (Number.isFinite(newBal)) a.startingBalance = newBal;
+    debouncedSave();
+    renderFinance();
+  };
+
+  window.deleteFinanceAccount = (id) => {
+    const a = state.finance.accounts.find(x => x.id === id);
+    if (!a) return;
+    const txCount = state.finance.transactions.filter(t => t.accountId === id || t.toAccountId === id).length;
+    if (txCount > 0) {
+      if (!confirm(`"${a.name}" has ${txCount} transactions. Delete account AND its transactions?`)) return;
+      state.finance.transactions = state.finance.transactions.filter(t => t.accountId !== id && t.toAccountId !== id);
+    } else {
+      if (!confirm(`Delete account "${a.name}"?`)) return;
+    }
+    state.finance.accounts = state.finance.accounts.filter(x => x.id !== id);
+    debouncedSave();
+    renderFinance();
+  };
+
+  function renderFinanceCategories() {
+    const list = document.getElementById('fin-categories-list');
+    if (!list) return;
+    list.innerHTML = '';
+    if (state.finance.categories.length === 0) {
+      list.innerHTML = '<div class="empty" style="padding: 12px;">No categories yet.</div>';
+    }
+    const thisMo = getThisMonthKey();
+    const ordered = [
+      ...state.finance.categories.filter(c => c.type === 'expense'),
+      ...state.finance.categories.filter(c => c.type === 'income')
+    ];
+    ordered.forEach(c => {
+      const total = getMonthCategoryTotal(c.id, thisMo, c.type);
+      const cap = Number(c.monthlyCap) || 0;
+      const pct = cap > 0 ? Math.min(100, (total / cap) * 100) : 0;
+      const overCap = cap > 0 && total > cap;
+      const fillCls = c.type === 'income' ? 'fin-budget-fill ok' : (overCap ? 'fin-budget-fill over' : 'fin-budget-fill');
+      const wrap = document.createElement('div');
+      wrap.className = 'fin-category-row';
+      const right = cap > 0
+        ? `${fmtMoney(total, { decimals: 0 })} / ${fmtMoney(cap, { decimals: 0 })}${c.type === 'income' ? ' goal' : ''}`
+        : fmtMoney(total, { decimals: 0 });
+      wrap.innerHTML = `
+        <div>
+          <div style="font-size:13px">${escapeHtml(c.name)} <span style="font-size:9px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.15em;margin-left:6px">${c.type}</span></div>
+          <div class="fin-budget-meta"><span>${right}</span><span>${cap > 0 ? Math.round(pct) + '%' : '—'}</span></div>
+          <div class="fin-budget-bar"><div class="${fillCls}" style="width:${pct}%"></div></div>
+        </div>
+        <div></div>
+        <div></div>
+        <button class="task-del del-cat">×</button>
+      `;
+      wrap.querySelector('.del-cat').onclick = (e) => { e.stopPropagation(); deleteFinanceCategory(c.id); };
+      wrap.style.cursor = 'pointer';
+      wrap.onclick = () => editFinanceCategory(c.id);
+      list.appendChild(wrap);
+    });
+  }
+
+  window.addFinanceCategory = () => {
+    const name = document.getElementById('fin-cat-name').value.trim();
+    const type = document.getElementById('fin-cat-type').value;
+    const capRaw = document.getElementById('fin-cat-cap').value;
+    const monthlyCap = capRaw === '' ? 0 : Number(capRaw);
+    if (!name) return;
+    state.finance.categories.push({
+      id: uid(), name, type,
+      monthlyCap: Number.isFinite(monthlyCap) ? monthlyCap : 0
+    });
+    document.getElementById('fin-cat-name').value = '';
+    document.getElementById('fin-cat-cap').value = '';
+    debouncedSave();
+    renderFinance();
+  };
+
+  window.editFinanceCategory = (id) => {
+    const c = state.finance.categories.find(x => x.id === id);
+    if (!c) return;
+    const newName = prompt('Category name:', c.name);
+    if (newName == null) return;
+    const newCapRaw = prompt(c.type === 'expense' ? 'Monthly cap ($, 0 = no cap):' : 'Monthly goal ($, 0 = none):', String(c.monthlyCap || 0));
+    if (newCapRaw == null) return;
+    const newCap = Number(newCapRaw);
+    c.name = newName.trim() || c.name;
+    if (Number.isFinite(newCap)) c.monthlyCap = newCap;
+    debouncedSave();
+    renderFinance();
+  };
+
+  window.deleteFinanceCategory = (id) => {
+    const c = state.finance.categories.find(x => x.id === id);
+    if (!c) return;
+    const txCount = state.finance.transactions.filter(t => t.categoryId === id).length;
+    const msg = txCount > 0
+      ? `"${c.name}" is used by ${txCount} transactions. Delete it (those transactions become uncategorized)?`
+      : `Delete category "${c.name}"?`;
+    if (!confirm(msg)) return;
+    state.finance.categories = state.finance.categories.filter(x => x.id !== id);
+    state.finance.transactions.forEach(t => { if (t.categoryId === id) t.categoryId = null; });
+    debouncedSave();
+    renderFinance();
+  };
+
+  function renderFinanceTransactions() {
+    const acctSel = document.getElementById('fin-filter-account');
+    const catSel = document.getElementById('fin-filter-category');
+    const typeSel = document.getElementById('fin-filter-type');
+    const search = document.getElementById('fin-filter-search');
+    if (!acctSel) return;
+
+    const prevAcct = acctSel.value, prevCat = catSel.value;
+    acctSel.innerHTML = '<option value="">All accounts</option>'
+      + state.finance.accounts.map(a => `<option value="${a.id}">${escapeHtml(a.name)}</option>`).join('');
+    catSel.innerHTML = '<option value="">All categories</option>'
+      + '<option value="__uncat">— uncategorized —</option>'
+      + state.finance.categories.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+    acctSel.value = prevAcct; catSel.value = prevCat;
+
+    acctSel.onchange = renderFinanceTransactions;
+    catSel.onchange = renderFinanceTransactions;
+    typeSel.onchange = renderFinanceTransactions;
+    search.oninput = renderFinanceTransactions;
+
+    const f_acct = acctSel.value, f_cat = catSel.value, f_type = typeSel.value;
+    const f_search = (search.value || '').toLowerCase().trim();
+
+    let txs = state.finance.transactions.slice();
+    if (f_acct) txs = txs.filter(t => t.accountId === f_acct || t.toAccountId === f_acct);
+    if (f_cat === '__uncat') txs = txs.filter(t => (t.type === 'expense' || t.type === 'income') && !t.categoryId);
+    else if (f_cat) txs = txs.filter(t => t.categoryId === f_cat);
+    if (f_type) txs = txs.filter(t => t.type === f_type);
+    if (f_search) txs = txs.filter(t => (t.note || '').toLowerCase().includes(f_search));
+
+    txs.sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
+
+    document.getElementById('fin-tx-count').textContent = txs.length + (txs.length === 1 ? ' tx' : ' txs');
+    const list = document.getElementById('fin-tx-list');
+    list.innerHTML = '';
+    if (txs.length === 0) {
+      list.innerHTML = '<div class="empty" style="padding: 12px;">No transactions match.</div>';
+      return;
+    }
+    const limited = txs.slice(0, 200);
+    limited.forEach(t => {
+      const acct = state.finance.accounts.find(a => a.id === t.accountId);
+      const toAcct = t.toAccountId ? state.finance.accounts.find(a => a.id === t.toAccountId) : null;
+      const cat = t.categoryId ? state.finance.categories.find(c => c.id === t.categoryId) : null;
+      const amtCls = t.type === 'income' ? 'amount income' : (t.type === 'expense' ? 'amount expense' : 'amount');
+      const amtSign = t.type === 'income' ? '+' : (t.type === 'expense' ? '-' : '');
+      const acctLabel = t.type === 'transfer'
+        ? `${acct ? acct.name : '?'} → ${toAcct ? toAcct.name : '?'}`
+        : (acct ? acct.name : '?');
+      const catLabel = t.type === 'transfer' ? '—' : (cat ? escapeHtml(cat.name) : '<span class="uncat">uncategorized</span>');
+      const row = document.createElement('div');
+      row.className = 'fin-tx-row';
+      row.innerHTML = `
+        <span class="date">${t.date}</span>
+        <span class="type-tag">${t.type}</span>
+        <span>${escapeHtml(t.note || '—')}</span>
+        <span style="font-size:11px;color:var(--text-dim)">${escapeHtml(acctLabel)} · ${catLabel}</span>
+        <span class="${amtCls}">${amtSign}${fmtMoney(t.amount, { decimals: 2 })}</span>
+        <button class="task-del del-tx">×</button>
+      `;
+      row.querySelector('.del-tx').onclick = (e) => {
+        e.stopPropagation();
+        if (!confirm('Delete this transaction?')) return;
+        state.finance.transactions = state.finance.transactions.filter(x => x.id !== t.id);
+        debouncedSave();
+        renderFinance();
+      };
+      row.style.cursor = 'pointer';
+      row.onclick = () => editFinanceTransaction(t.id);
+      list.appendChild(row);
+    });
+  }
+
+  window.editFinanceTransaction = (id) => {
+    const t = state.finance.transactions.find(x => x.id === id);
+    if (!t) return;
+    if (t.type === 'transfer') return; // transfers aren't categorized
+    const cats = state.finance.categories.filter(c => c.type === t.type);
+    if (cats.length === 0) { alert('Add some ' + t.type + ' categories first.'); return; }
+    const lines = cats.map((c, i) => `${i + 1}. ${c.name}`).join('\n');
+    const cur = t.categoryId ? cats.findIndex(c => c.id === t.categoryId) + 1 : '';
+    const choice = prompt(`Categorize:\n${t.date} · ${fmtMoney(t.amount, {decimals:2})} · ${t.note || '—'}\n\n${lines}\n\nEnter number (blank = uncategorized):`, cur === '' ? '' : String(cur));
+    if (choice == null) return;
+    if (choice.trim() === '') { t.categoryId = null; }
+    else {
+      const idx = parseInt(choice, 10);
+      if (Number.isFinite(idx) && idx >= 1 && idx <= cats.length) t.categoryId = cats[idx - 1].id;
+    }
+    debouncedSave();
+    renderFinance();
+  };
+
+  // CSV IMPORT
+  window.openCsvImport = () => {
+    if (state.finance.accounts.length === 0) { alert('Add at least one account before importing CSV.'); return; }
+    showModal(`
+      <h3>Import CSV</h3>
+      <p style="color:var(--text-dim);font-size:11px;margin-bottom:10px">Paste CSV from your bank statement, then map the columns.</p>
+      <textarea id="csv-input" class="json-textarea" placeholder="Date,Description,Amount&#10;2026-05-01,Coffee,-4.50"></textarea>
+      <div style="margin:10px 0;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <input type="file" id="csv-file" accept=".csv,text/csv" style="font-size:11px">
+        <label style="font-size:11px;color:var(--text-dim)"><input type="checkbox" id="csv-invert"> positive = expense (credit card)</label>
+      </div>
+      <div style="margin:10px 0">
+        <label style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.15em">Account</label>
+        <select id="csv-default-account" style="margin-left:8px;padding:6px 8px">
+          ${state.finance.accounts.map(a => `<option value="${a.id}">${escapeHtml(a.name)}</option>`).join('')}
+        </select>
+      </div>
+      <button class="btn btn-sm" onclick="parseCsvInput()">Parse</button>
+      <div id="csv-error" class="fin-error hidden"></div>
+      <div id="csv-mapping-area" class="hidden">
+        <h4 style="margin-top:14px;font-family:'Fraunces',serif;font-weight:500">Column mapping</h4>
+        <div id="csv-mapping" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-top:8px;font-size:11px"></div>
+        <div class="fin-csv-preview" id="csv-preview"></div>
+        <div style="margin-top:12px;display:flex;gap:8px">
+          <button class="btn" onclick="confirmCsvImport()">Import</button>
+          <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+        </div>
+      </div>
+    `);
+    document.getElementById('csv-file').onchange = (e) => {
+      const f = e.target.files[0];
+      if (!f) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => { document.getElementById('csv-input').value = ev.target.result; };
+      reader.readAsText(f);
+    };
+  };
+
+  function parseCsvLine(line) {
+    const cells = [];
+    let cur = '', inQuote = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (inQuote) {
+        if (ch === '"' && line[i + 1] === '"') { cur += '"'; i++; }
+        else if (ch === '"') { inQuote = false; }
+        else cur += ch;
+      } else {
+        if (ch === ',') { cells.push(cur); cur = ''; }
+        else if (ch === '"') { inQuote = true; }
+        else cur += ch;
+      }
+    }
+    cells.push(cur);
+    return cells.map(c => c.trim());
+  }
+
+  function normalizeDateCell(s) {
+    if (!s) return '';
+    s = String(s).trim();
+    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+    let m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+    if (m) {
+      const y = m[3].length === 2 ? '20' + m[3] : m[3];
+      return `${y}-${m[1].padStart(2,'0')}-${m[2].padStart(2,'0')}`;
+    }
+    m = s.match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})$/);
+    if (m) return `${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`;
+    const d = new Date(s);
+    if (!isNaN(d.getTime())) return d.toISOString().slice(0, 10);
+    return s;
+  }
+
+  window.parseCsvInput = () => {
+    const errEl = document.getElementById('csv-error');
+    errEl.classList.add('hidden'); errEl.textContent = '';
+    const text = document.getElementById('csv-input').value.trim();
+    if (!text) { errEl.textContent = 'Paste CSV or upload a file.'; errEl.classList.remove('hidden'); return; }
+    const lines = text.split(/\r?\n/).filter(l => l.trim());
+    if (lines.length < 2) { errEl.textContent = 'Need header row + at least one data row.'; errEl.classList.remove('hidden'); return; }
+    const headers = parseCsvLine(lines[0]);
+    const rows = lines.slice(1).map(l => parseCsvLine(l));
+    financeCsvData = { headers, rows };
+
+    const guess = (re) => headers.findIndex(h => re.test(h));
+    const dateIdx = guess(/date|posted/i);
+    const amtIdx = guess(/amount|amt/i);
+    const debitIdx = guess(/debit|withdrawal/i);
+    const creditIdx = guess(/credit|deposit/i);
+    const descIdx = guess(/desc|memo|name|payee|merchant/i);
+
+    const buildSelect = (id, sel) => {
+      const opts = ['<option value="-1">— ignore —</option>']
+        .concat(headers.map((h, i) => `<option value="${i}"${i === sel ? ' selected' : ''}>${escapeHtml(h)}</option>`)).join('');
+      return `<select id="${id}" style="width:100%;padding:6px">${opts}</select>`;
+    };
+    document.getElementById('csv-mapping').innerHTML = `
+      <div><div style="color:var(--text-dim);text-transform:uppercase;letter-spacing:0.15em;font-size:9px;margin-bottom:4px">Date</div>${buildSelect('csv-map-date', dateIdx)}</div>
+      <div><div style="color:var(--text-dim);text-transform:uppercase;letter-spacing:0.15em;font-size:9px;margin-bottom:4px">Amount (signed)</div>${buildSelect('csv-map-amount', amtIdx)}</div>
+      <div><div style="color:var(--text-dim);text-transform:uppercase;letter-spacing:0.15em;font-size:9px;margin-bottom:4px">Description</div>${buildSelect('csv-map-desc', descIdx)}</div>
+      <div><div style="color:var(--text-dim);text-transform:uppercase;letter-spacing:0.15em;font-size:9px;margin-bottom:4px">— or — Debit</div>${buildSelect('csv-map-debit', debitIdx)}</div>
+      <div><div style="color:var(--text-dim);text-transform:uppercase;letter-spacing:0.15em;font-size:9px;margin-bottom:4px">— or — Credit</div>${buildSelect('csv-map-credit', creditIdx)}</div>
+    `;
+    ['date','amount','desc','debit','credit'].forEach(k => {
+      document.getElementById('csv-map-' + k).onchange = renderCsvPreview;
+    });
+    document.getElementById('csv-invert').onchange = renderCsvPreview;
+    renderCsvPreview();
+    document.getElementById('csv-mapping-area').classList.remove('hidden');
+  };
+
+  function extractCsvRow(r) {
+    const dateIdx = parseInt(document.getElementById('csv-map-date').value, 10);
+    const amtIdx = parseInt(document.getElementById('csv-map-amount').value, 10);
+    const descIdx = parseInt(document.getElementById('csv-map-desc').value, 10);
+    const debitIdx = parseInt(document.getElementById('csv-map-debit').value, 10);
+    const creditIdx = parseInt(document.getElementById('csv-map-credit').value, 10);
+    const invert = document.getElementById('csv-invert').checked;
+    const date = dateIdx >= 0 ? normalizeDateCell(r[dateIdx]) : '';
+    const desc = descIdx >= 0 ? (r[descIdx] || '').trim() : '';
+    let amount = 0, type = null;
+    if (debitIdx >= 0 && creditIdx >= 0 && (r[debitIdx] || r[creditIdx])) {
+      const debit = parseFloat((r[debitIdx] || '').replace(/[^0-9.\-]/g, ''));
+      const credit = parseFloat((r[creditIdx] || '').replace(/[^0-9.\-]/g, ''));
+      if (Number.isFinite(credit) && credit > 0) { amount = credit; type = 'income'; }
+      else if (Number.isFinite(debit) && debit > 0) { amount = debit; type = 'expense'; }
+    } else if (amtIdx >= 0) {
+      const raw = parseFloat((r[amtIdx] || '').replace(/[^0-9.\-]/g, ''));
+      if (Number.isFinite(raw) && raw !== 0) {
+        if (invert) {
+          if (raw >= 0) { amount = raw; type = 'expense'; }
+          else { amount = -raw; type = 'income'; }
+        } else {
+          if (raw >= 0) { amount = raw; type = 'income'; }
+          else { amount = -raw; type = 'expense'; }
+        }
+      }
+    }
+    return { date, desc, amount: Math.abs(amount), type };
+  }
+
+  function renderCsvPreview() {
+    if (!financeCsvData) return;
+    const preview = document.getElementById('csv-preview');
+    const rows = financeCsvData.rows.slice(0, 12);
+    const tbl = ['<table class="fin-csv-table"><thead><tr><th>Date</th><th>Description</th><th>Type</th><th>Amount</th></tr></thead><tbody>'];
+    rows.forEach(r => {
+      const x = extractCsvRow(r);
+      tbl.push(`<tr><td>${escapeHtml(x.date)}</td><td>${escapeHtml(x.desc).slice(0,60)}</td><td>${x.type || '—'}</td><td>${fmtMoney(x.amount, {decimals:2})}</td></tr>`);
+    });
+    tbl.push('</tbody></table>');
+    preview.innerHTML = tbl.join('');
+  }
+
+  window.confirmCsvImport = () => {
+    const accountId = document.getElementById('csv-default-account').value;
+    if (!accountId) { alert('Pick an account first.'); return; }
+    let added = 0, skipped = 0;
+    financeCsvData.rows.forEach(r => {
+      const x = extractCsvRow(r);
+      if (!x.date || !x.type || x.amount <= 0) { skipped++; return; }
+      state.finance.transactions.push({
+        id: uid(), date: x.date, amount: x.amount, type: x.type,
+        accountId, categoryId: null, note: x.desc
+      });
+      added++;
+    });
+    closeModal();
+    debouncedSave();
+    renderFinance();
+    alert(`Imported ${added} transaction${added === 1 ? '' : 's'}${skipped > 0 ? '; skipped ' + skipped : ''}.`);
+  };
+
   // EXPORT
   window.exportData = () => {
     const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
@@ -2583,6 +3387,7 @@ const firebaseConfig = {
         if (!state.habitHistory) state.habitHistory = {};
         if (state.categories.length === 0) state.categories = ['General'];
         ensureWorkoutShape();
+        ensureFinanceShape();
         applyDailyResets();
         await setDoc(userDocRef, state);
       } else {
@@ -2601,6 +3406,7 @@ const firebaseConfig = {
           if (!state.habitHistory) state.habitHistory = {};
           if (state.categories.length === 0) state.categories = ['General'];
           ensureWorkoutShape();
+          ensureFinanceShape();
           renderAll();
         }
       });
@@ -2635,6 +3441,7 @@ const firebaseConfig = {
     renderSchedule();
     renderReviews();
     renderWorkout();
+    renderFinance();
   }
 
   async function init() {
