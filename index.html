@@ -449,6 +449,40 @@
   .ai-loading { font-style: italic; color: var(--gold); font-size: 12px; }
   .ai-loading::after { content: '...'; animation: dot-blink 1.2s infinite; }
   @keyframes dot-blink { 0%, 20% { content: '.'; } 40% { content: '..'; } 60%, 100% { content: '...'; } }
+
+  /* Morning Brief */
+  .morning-brief-card { background: linear-gradient(180deg, var(--bg-card) 0%, rgba(212, 165, 116, 0.04) 100%); border-color: var(--border-bright); }
+
+  /* People CRM */
+  .people-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; align-items: center; }
+  .people-filters select, .people-filters input { padding: 6px 8px; font-size: 11px; max-width: 200px; }
+  .people-row { display: grid; grid-template-columns: 1fr 80px 90px 1fr auto auto; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px dashed var(--border); }
+  .people-row:last-child { border-bottom: none; }
+  .people-row .name { font-family: 'Fraunces', serif; font-size: 15px; }
+  .people-row .relation { font-size: 9px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-dim); }
+  .people-row .cadence-tag { font-size: 10px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
+  .people-row .status { font-size: 11px; }
+  .people-row .status.overdue { color: var(--accent); }
+  .people-row .status.due { color: var(--gold); }
+  .people-row .status.ok { color: var(--green); }
+  .people-row .status.never { color: var(--text-faint); font-style: italic; }
+  .people-row .note { font-size: 11px; color: var(--text-dim); }
+  .people-row .ping { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 4px 10px; font-family: 'JetBrains Mono', monospace; font-size: 9px; text-transform: uppercase; letter-spacing: 0.15em; cursor: pointer; }
+  .people-row .ping:hover { background: var(--gold); color: var(--bg); }
+  @media (max-width: 700px) { .people-row { grid-template-columns: 1fr auto; row-gap: 4px; } .people-row > .relation, .people-row > .cadence-tag, .people-row > .note { display: none; } }
+  .people-add-grid { display: grid; grid-template-columns: 1fr 120px 120px 130px 1fr auto; gap: 8px; align-items: center; }
+  @media (max-width: 800px) { .people-add-grid { grid-template-columns: 1fr 1fr; } .people-add-grid > button { grid-column: span 2; } }
+  .people-add-grid input, .people-add-grid select { padding: 8px 10px; font-size: 12px; }
+
+  /* Recurring transactions */
+  .fin-recur-add { display: grid; grid-template-columns: 110px 100px 1fr 1fr 1fr 110px 110px 1fr auto; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border); align-items: center; }
+  @media (max-width: 1100px) { .fin-recur-add { grid-template-columns: repeat(3, 1fr); } .fin-recur-add > button { grid-column: span 3; } }
+  .fin-recur-add input, .fin-recur-add select { padding: 8px 10px; font-size: 12px; }
+  .fin-recur-row { display: grid; grid-template-columns: 80px 1fr 1fr 100px 100px 100px auto auto; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px dashed var(--border); font-size: 12px; }
+  .fin-recur-row:last-child { border-bottom: none; }
+  .fin-recur-row .recur-type-tag { font-size: 9px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-dim); }
+  .fin-recur-row .recur-amount { font-family: 'Fraunces', serif; font-size: 14px; }
+  .fin-recur-row .recur-next { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--gold); }
 </style>
 </head>
 <body>
@@ -491,6 +525,7 @@
   <button class="tab" data-view="goals" onclick="showView('goals')">Goals</button>
   <button class="tab" data-view="workouts" onclick="showView('workouts')">Workouts</button>
   <button class="tab" data-view="finance" onclick="showView('finance')">Finance</button>
+  <button class="tab" data-view="people" onclick="showView('people')">People</button>
   <button class="tab" data-view="intel" onclick="showView('intel')">Intel</button>
 </nav>
 
@@ -501,6 +536,18 @@
   <div class="card-title">Big 3 <span class="meta" id="b3-meta">0 / 0</span><button class="btn btn-sm btn-secondary" id="b3-suggest-btn" onclick="suggestBigThree()" style="margin-left:auto;font-size:10px">✦ Suggest</button></div>
   <div id="big-three-list"></div>
   <div id="b3-suggestions" class="hidden" style="margin-top:12px;padding-top:12px;border-top:1px dashed var(--border)"></div>
+</div>
+
+<div class="card morning-brief-card hidden" id="morning-brief-card" style="margin-bottom: 16px;">
+  <div class="card-label">Brief <span id="brief-meta" style="color:var(--text-faint);margin-left:8px"></span></div>
+  <div class="card-title">Morning Brief <button class="btn btn-sm btn-secondary" id="brief-refresh-btn" onclick="generateMorningBrief()" style="margin-left:auto;font-size:10px">✦ Regenerate</button></div>
+  <div id="brief-content" class="ai-digest" style="border:none;padding:0;min-height:0;background:transparent"></div>
+</div>
+
+<div class="card" style="margin-bottom: 16px;" id="brief-empty-card">
+  <div class="card-label">AI</div>
+  <div class="card-title">Morning Brief</div>
+  <div class="empty" style="padding:14px">No brief yet today. <a href="#" onclick="generateMorningBrief();return false" style="color:var(--gold)">Generate one</a> — short status read + 2-4 nudges from your data.</div>
 </div>
 
 <div class="card" style="margin-bottom: 16px;">
@@ -861,7 +908,91 @@
     <div class="fin-tx-list" id="fin-tx-list"></div>
   </div>
 
+  <div class="card" style="margin-top: 16px;">
+    <div class="card-label">Auto</div>
+    <div class="card-title">Recurring <span class="meta" id="fin-recur-meta">0</span></div>
+    <div id="fin-recur-list"></div>
+    <div class="fin-recur-add">
+      <select id="fin-recur-type">
+        <option value="expense">Expense</option>
+        <option value="income">Income</option>
+        <option value="transfer">Transfer</option>
+      </select>
+      <input type="number" step="0.01" id="fin-recur-amount" placeholder="$ amount">
+      <select id="fin-recur-account"></select>
+      <select id="fin-recur-to-account" style="display:none"></select>
+      <select id="fin-recur-category"></select>
+      <select id="fin-recur-schedule">
+        <option value="monthly">Monthly</option>
+        <option value="biweekly">Biweekly</option>
+        <option value="weekly">Weekly</option>
+        <option value="yearly">Yearly</option>
+      </select>
+      <input type="number" min="1" max="31" id="fin-recur-day" placeholder="day of month" value="1">
+      <input type="text" id="fin-recur-note" placeholder="Note (e.g. Rent)">
+      <button class="btn btn-sm" onclick="addRecurringTx()">Add</button>
+    </div>
+  </div>
+
 </div><!-- /view-finance -->
+
+<div class="view hidden" id="view-people">
+
+  <div class="card" style="margin-bottom: 16px;">
+    <div class="card-label">Cadence</div>
+    <div class="card-title">People <span class="meta" id="people-meta">0 contacts · 0 overdue</span></div>
+
+    <div class="people-filters">
+      <select id="people-sort" onchange="renderPeople()">
+        <option value="overdue">Most overdue first</option>
+        <option value="recent">Recently contacted</option>
+        <option value="name">Name (A-Z)</option>
+      </select>
+      <select id="people-filter-relation" onchange="renderPeople()">
+        <option value="">All relationships</option>
+        <option value="family">Family</option>
+        <option value="friend">Friend</option>
+        <option value="mentor">Mentor</option>
+        <option value="colleague">Colleague</option>
+        <option value="client">Client</option>
+        <option value="network">Network</option>
+        <option value="other">Other</option>
+      </select>
+      <input type="text" id="people-filter-search" placeholder="Search name or note..." oninput="renderPeople()">
+    </div>
+
+    <div id="people-list"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">Add</div>
+    <div class="card-title">New Contact</div>
+    <div class="people-add-grid">
+      <input type="text" id="person-name" placeholder="Name">
+      <select id="person-relation">
+        <option value="friend">Friend</option>
+        <option value="family">Family</option>
+        <option value="mentor">Mentor</option>
+        <option value="colleague">Colleague</option>
+        <option value="client">Client</option>
+        <option value="network">Network</option>
+        <option value="other">Other</option>
+      </select>
+      <select id="person-cadence">
+        <option value="7">Weekly</option>
+        <option value="14">Biweekly</option>
+        <option value="30" selected>Monthly</option>
+        <option value="90">Quarterly</option>
+        <option value="180">Twice yearly</option>
+        <option value="365">Yearly</option>
+      </select>
+      <input type="date" id="person-last">
+      <input type="text" id="person-note" placeholder="Note (optional)">
+      <button class="btn btn-sm" onclick="addPerson()">Add</button>
+    </div>
+  </div>
+
+</div><!-- /view-people -->
 
 <div class="view hidden" id="view-intel">
 
@@ -974,7 +1105,9 @@ const firebaseConfig = {
       finance: { accounts: [], categories: [], transactions: [] },
       bigThree: { items: [], history: {}, lastSeenDate: '' },
       goals: { yearly: [], objectives: [] },
-      ai: { weeklyDigests: {}, bigThreeSuggestions: {}, qaHistory: [] },
+      ai: { weeklyDigests: {}, bigThreeSuggestions: {}, qaHistory: [], briefs: {} },
+      people: [],
+      recurring: [],
       lastDate: todayStr(), createdAt: todayStr()
     };
   }
@@ -1008,10 +1141,19 @@ const firebaseConfig = {
   }
 
   function ensureAiShape() {
-    if (!state.ai || typeof state.ai !== 'object') state.ai = { weeklyDigests: {}, bigThreeSuggestions: {}, qaHistory: [] };
+    if (!state.ai || typeof state.ai !== 'object') state.ai = { weeklyDigests: {}, bigThreeSuggestions: {}, qaHistory: [], briefs: {} };
     if (!state.ai.weeklyDigests || typeof state.ai.weeklyDigests !== 'object') state.ai.weeklyDigests = {};
     if (!state.ai.bigThreeSuggestions || typeof state.ai.bigThreeSuggestions !== 'object') state.ai.bigThreeSuggestions = {};
     if (!Array.isArray(state.ai.qaHistory)) state.ai.qaHistory = [];
+    if (!state.ai.briefs || typeof state.ai.briefs !== 'object') state.ai.briefs = {};
+  }
+
+  function ensurePeopleShape() {
+    if (!Array.isArray(state.people)) state.people = [];
+  }
+
+  function ensureRecurringShape() {
+    if (!Array.isArray(state.recurring)) state.recurring = [];
   }
 
   let state = emptyState();
@@ -3703,6 +3845,27 @@ const firebaseConfig = {
     }
     lines.push('');
 
+    if (Array.isArray(state.people) && state.people.length > 0) {
+      const overdue = state.people.map(p => ({ p, s: personStatus(p) })).filter(x => x.s.kind === 'overdue' || x.s.kind === 'due');
+      lines.push(`## People (${state.people.length} contacts, ${overdue.filter(x => x.s.kind === 'overdue').length} overdue)`);
+      if (overdue.length > 0) {
+        lines.push('Needs outreach:');
+        overdue.slice(0, 10).forEach(({ p, s }) => {
+          lines.push(`  - ${p.name} (${p.relation || 'other'}, ${PEOPLE_CADENCES[p.cadenceDays] || p.cadenceDays + 'd'}): ${s.label}`);
+        });
+      }
+      lines.push('');
+    }
+
+    if (Array.isArray(state.recurring) && state.recurring.length > 0) {
+      lines.push(`## Recurring rules (${state.recurring.length})`);
+      state.recurring.slice(0, 10).forEach(r => {
+        const acct = state.finance.accounts.find(a => a.id === r.accountId);
+        lines.push(`  - ${r.type} ${fmtMoney(r.amount, {decimals:0})} ${r.schedule} (${r.note || 'unnamed'}) on ${acct ? acct.name : '?'}, next ${r.nextRun || '—'}`);
+      });
+      lines.push('');
+    }
+
     const currentYear = new Date().getFullYear();
     const currentQuarter = Math.floor(new Date().getMonth() / 3) + 1;
     const currentQ = `${currentYear}-Q${currentQuarter}`;
@@ -4146,6 +4309,17 @@ const firebaseConfig = {
       });
     }
 
+    if (Array.isArray(state.people) && state.people.length > 0) {
+      const overdueCount = getOverdueCount();
+      tiles.push({
+        label: 'People',
+        num: String(state.people.length),
+        sub: overdueCount > 0 ? `${overdueCount} overdue` : 'all current',
+        cls: overdueCount > 0 ? 'alert' : 'ok',
+        action: `showView('people')`
+      });
+    }
+
     container.innerHTML = tiles.map(t => `
       <div class="today-tile" onclick="${t.action}">
         <div class="label">${t.label}</div>
@@ -4493,6 +4667,398 @@ const firebaseConfig = {
     renderGoals();
   }
 
+  // MORNING BRIEF
+  function renderMorningBrief() {
+    const card = document.getElementById('morning-brief-card');
+    const emptyCard = document.getElementById('brief-empty-card');
+    const content = document.getElementById('brief-content');
+    const meta = document.getElementById('brief-meta');
+    if (!card || !content) return;
+    ensureAiShape();
+    const today = todayStr();
+    const brief = state.ai.briefs[today];
+    if (!brief) {
+      card.classList.add('hidden');
+      if (emptyCard) emptyCard.classList.remove('hidden');
+      return;
+    }
+    card.classList.remove('hidden');
+    if (emptyCard) emptyCard.classList.add('hidden');
+    content.innerHTML = renderMarkdownLite(brief.content);
+    meta.textContent = `generated ${new Date(brief.generatedAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`;
+  }
+
+  window.generateMorningBrief = async () => {
+    if (!getApiKey()) {
+      const c = document.getElementById('brief-content');
+      const card = document.getElementById('morning-brief-card');
+      const empty = document.getElementById('brief-empty-card');
+      if (card) card.classList.remove('hidden');
+      if (empty) empty.classList.add('hidden');
+      if (c) c.innerHTML = '<div class="fin-error">Add a Claude API key in Intel → Settings to enable the morning brief.</div>';
+      return;
+    }
+    const card = document.getElementById('morning-brief-card');
+    const empty = document.getElementById('brief-empty-card');
+    const content = document.getElementById('brief-content');
+    card.classList.remove('hidden');
+    if (empty) empty.classList.add('hidden');
+    content.innerHTML = '<div class="ai-loading">Generating morning brief</div>';
+    try {
+      const context = buildAiContext();
+      const system = `You are the user's chief of staff giving a morning brief. Write a SHORT markdown response: one opening sentence ("Today: ...") naming the single most important thing, then a "## Nudges" section with 2-4 bullets surfacing anomalies, gaps, deadlines, or streak risks from the data. Each bullet must reference a specific number from the data. Be direct. Under 150 words total.`;
+      const userMessage = `Date: ${todayStr()}. Data:\n\n${context}\n\nWrite the morning brief now.`;
+      const reply = await callClaude(userMessage, { system, maxTokens: 600 });
+      state.ai.briefs[todayStr()] = { content: reply, generatedAt: new Date().toISOString() };
+      debouncedSave();
+      renderMorningBrief();
+    } catch (e) {
+      content.innerHTML = `<div class="fin-error">${escapeHtml(e.message)}</div>`;
+    }
+  };
+
+  // PEOPLE CRM
+  const PEOPLE_CADENCES = { 7: 'weekly', 14: 'biweekly', 30: 'monthly', 90: 'quarterly', 180: '6-monthly', 365: 'yearly' };
+
+  function daysSince(dateStr) {
+    if (!dateStr) return null;
+    const today = new Date(todayStr() + 'T00:00:00');
+    const d = new Date(dateStr + 'T00:00:00');
+    return Math.floor((today - d) / 86400000);
+  }
+
+  function personStatus(p) {
+    const days = daysSince(p.lastContacted);
+    const cadence = Number(p.cadenceDays) || 30;
+    if (days === null) return { kind: 'never', label: 'never logged', daysOver: null };
+    if (days <= cadence) return { kind: 'ok', label: `${days}d ago`, daysOver: days - cadence };
+    if (days <= cadence + 7) return { kind: 'due', label: `${days}d ago · due`, daysOver: days - cadence };
+    return { kind: 'overdue', label: `${days}d ago · overdue by ${days - cadence}d`, daysOver: days - cadence };
+  }
+
+  function getOverdueCount() {
+    ensurePeopleShape();
+    return state.people.filter(p => {
+      const s = personStatus(p);
+      return s.kind === 'overdue';
+    }).length;
+  }
+
+  function renderPeople() {
+    ensurePeopleShape();
+    const list = document.getElementById('people-list');
+    if (!list) return;
+
+    const sort = document.getElementById('people-sort')?.value || 'overdue';
+    const relFilter = document.getElementById('people-filter-relation')?.value || '';
+    const searchQ = (document.getElementById('people-filter-search')?.value || '').toLowerCase().trim();
+
+    let people = state.people.slice();
+    if (relFilter) people = people.filter(p => p.relation === relFilter);
+    if (searchQ) people = people.filter(p => (p.name + ' ' + (p.note || '')).toLowerCase().includes(searchQ));
+
+    people.sort((a, b) => {
+      if (sort === 'name') return (a.name || '').localeCompare(b.name || '');
+      if (sort === 'recent') {
+        const da = daysSince(a.lastContacted); const db = daysSince(b.lastContacted);
+        if (da === null) return 1;
+        if (db === null) return -1;
+        return da - db;
+      }
+      // overdue first: higher daysOver means more overdue
+      const sa = personStatus(a).daysOver; const sb = personStatus(b).daysOver;
+      if (sa === null) return 1;
+      if (sb === null) return -1;
+      return sb - sa;
+    });
+
+    const overdueCount = getOverdueCount();
+    document.getElementById('people-meta').textContent = `${state.people.length} contact${state.people.length === 1 ? '' : 's'} · ${overdueCount} overdue`;
+
+    list.innerHTML = '';
+    if (people.length === 0) {
+      list.innerHTML = '<div class="empty" style="padding:14px">No contacts yet. Add someone below.</div>';
+      return;
+    }
+
+    people.forEach(p => {
+      const s = personStatus(p);
+      const cadenceLabel = PEOPLE_CADENCES[p.cadenceDays] || `${p.cadenceDays}d`;
+      const row = document.createElement('div');
+      row.className = 'people-row';
+      row.innerHTML = `
+        <span class="name">${escapeHtml(p.name)}</span>
+        <span class="relation">${escapeHtml(p.relation || 'other')}</span>
+        <span class="cadence-tag">${escapeHtml(cadenceLabel)}</span>
+        <span class="status ${s.kind}">${escapeHtml(s.label)}</span>
+        <button class="ping" title="Log contact today">log</button>
+        <button class="task-del">×</button>
+      `;
+      if (p.note) {
+        const noteRow = document.createElement('div');
+        noteRow.style.cssText = 'font-size:11px;color:var(--text-dim);padding:0 0 8px 0;border-bottom:1px dashed var(--border);grid-column:1/-1;margin-top:-4px';
+        noteRow.textContent = p.note;
+      }
+      row.querySelector('.ping').onclick = () => logPersonContact(p.id);
+      row.querySelector('.task-del').onclick = () => deletePerson(p.id);
+      row.style.cursor = 'pointer';
+      row.onclick = (e) => {
+        if (e.target.tagName === 'BUTTON') return;
+        editPerson(p.id);
+      };
+      list.appendChild(row);
+    });
+  }
+
+  window.addPerson = () => {
+    const name = document.getElementById('person-name').value.trim();
+    if (!name) return;
+    const relation = document.getElementById('person-relation').value;
+    const cadenceDays = Number(document.getElementById('person-cadence').value) || 30;
+    const lastRaw = document.getElementById('person-last').value;
+    const note = document.getElementById('person-note').value.trim();
+    state.people.push({
+      id: uid(),
+      name,
+      relation,
+      cadenceDays,
+      lastContacted: lastRaw || null,
+      note,
+      history: [],
+      createdAt: todayStr()
+    });
+    document.getElementById('person-name').value = '';
+    document.getElementById('person-last').value = '';
+    document.getElementById('person-note').value = '';
+    debouncedSave();
+    renderPeople();
+    renderTodayLanding();
+  };
+
+  window.logPersonContact = (id) => {
+    const p = state.people.find(x => x.id === id);
+    if (!p) return;
+    p.lastContacted = todayStr();
+    if (!Array.isArray(p.history)) p.history = [];
+    p.history.push(todayStr());
+    if (p.history.length > 100) p.history = p.history.slice(-100);
+    debouncedSave();
+    renderPeople();
+    renderTodayLanding();
+  };
+
+  window.editPerson = (id) => {
+    const p = state.people.find(x => x.id === id);
+    if (!p) return;
+    const newName = prompt('Name:', p.name);
+    if (newName == null) return;
+    if (newName.trim()) p.name = newName.trim();
+    const newCadence = prompt('Cadence (days, e.g. 30 for monthly, 90 for quarterly):', String(p.cadenceDays));
+    if (newCadence != null) {
+      const n = parseInt(newCadence, 10);
+      if (Number.isFinite(n) && n > 0) p.cadenceDays = n;
+    }
+    const newNote = prompt('Note:', p.note || '');
+    if (newNote != null) p.note = newNote.trim();
+    debouncedSave();
+    renderPeople();
+  };
+
+  window.deletePerson = (id) => {
+    const p = state.people.find(x => x.id === id);
+    if (!p) return;
+    if (!confirm(`Delete "${p.name}"?`)) return;
+    state.people = state.people.filter(x => x.id !== id);
+    debouncedSave();
+    renderPeople();
+    renderTodayLanding();
+  };
+
+  // RECURRING TRANSACTIONS
+  function computeNextRunDate(schedule, dayOfMonth, fromDate) {
+    const base = fromDate ? new Date(fromDate + 'T00:00:00') : new Date(todayStr() + 'T00:00:00');
+    if (schedule === 'monthly') {
+      const next = new Date(base.getFullYear(), base.getMonth(), Math.min(dayOfMonth || 1, 28));
+      if (next <= base) next.setMonth(next.getMonth() + 1);
+      return localDateStr(next);
+    } else if (schedule === 'yearly') {
+      const next = new Date(base.getFullYear(), base.getMonth(), Math.min(dayOfMonth || 1, 28));
+      next.setFullYear(next.getFullYear() + 1);
+      return localDateStr(next);
+    } else if (schedule === 'weekly') {
+      const next = new Date(base);
+      next.setDate(next.getDate() + 7);
+      return localDateStr(next);
+    } else if (schedule === 'biweekly') {
+      const next = new Date(base);
+      next.setDate(next.getDate() + 14);
+      return localDateStr(next);
+    }
+    return localDateStr(base);
+  }
+
+  function runRecurringExpansion() {
+    ensureRecurringShape();
+    ensureFinanceShape();
+    const today = todayStr();
+    let created = 0;
+    state.recurring.forEach(r => {
+      if (!r.nextRun) {
+        r.nextRun = computeNextRunDate(r.schedule, r.dayOfMonth, r.lastRun || r.createdAt || today);
+        return;
+      }
+      let guard = 0;
+      while (r.nextRun <= today && guard < 36) {
+        const tx = {
+          id: uid(),
+          date: r.nextRun,
+          amount: Math.abs(Number(r.amount) || 0),
+          type: r.type,
+          accountId: r.accountId,
+          note: r.note ? `${r.note} (auto)` : '(auto)',
+          recurringId: r.id
+        };
+        if (r.type === 'transfer') tx.toAccountId = r.toAccountId;
+        else tx.categoryId = r.categoryId || null;
+        state.finance.transactions.push(tx);
+        r.lastRun = r.nextRun;
+        r.nextRun = computeNextRunDate(r.schedule, r.dayOfMonth, r.nextRun);
+        created++;
+        guard++;
+      }
+    });
+    if (created > 0) {
+      debouncedSave();
+    }
+  }
+
+  function renderRecurring() {
+    ensureRecurringShape();
+    ensureFinanceShape();
+    const list = document.getElementById('fin-recur-list');
+    if (!list) return;
+
+    const typeSel = document.getElementById('fin-recur-type');
+    const acctSel = document.getElementById('fin-recur-account');
+    const toAcctSel = document.getElementById('fin-recur-to-account');
+    const catSel = document.getElementById('fin-recur-category');
+    if (typeSel) {
+      const accounts = state.finance.accounts.filter(a => !a.archived);
+      const acctOpts = accounts.map(a => `<option value="${a.id}">${escapeHtml(a.name)}</option>`).join('');
+      acctSel.innerHTML = '<option value="">— account —</option>' + acctOpts;
+      toAcctSel.innerHTML = '<option value="">— to account —</option>' + acctOpts;
+      const type = typeSel.value;
+      const wantedType = type === 'income' ? 'income' : 'expense';
+      const cats = state.finance.categories.filter(c => c.type === wantedType);
+      catSel.innerHTML = '<option value="">— category —</option>' + cats.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+      if (type === 'transfer') { toAcctSel.style.display = ''; catSel.style.display = 'none'; }
+      else { toAcctSel.style.display = 'none'; catSel.style.display = ''; }
+      typeSel.onchange = renderRecurring;
+    }
+
+    document.getElementById('fin-recur-meta').textContent = state.recurring.length + (state.recurring.length === 1 ? ' rule' : ' rules');
+
+    list.innerHTML = '';
+    if (state.recurring.length === 0) {
+      list.innerHTML = '<div class="empty" style="padding:12px">No recurring rules yet. Add rent, salary, subscriptions below.</div>';
+      return;
+    }
+    state.recurring.forEach(r => {
+      const acct = state.finance.accounts.find(a => a.id === r.accountId);
+      const cat = r.categoryId ? state.finance.categories.find(c => c.id === r.categoryId) : null;
+      const toAcct = r.toAccountId ? state.finance.accounts.find(a => a.id === r.toAccountId) : null;
+      const row = document.createElement('div');
+      row.className = 'fin-recur-row';
+      const acctLabel = r.type === 'transfer' && toAcct
+        ? `${acct ? acct.name : '?'} → ${toAcct.name}`
+        : (acct ? acct.name : '?');
+      const catLabel = r.type === 'transfer' ? '—' : (cat ? cat.name : 'uncategorized');
+      row.innerHTML = `
+        <span class="recur-type-tag">${r.type}</span>
+        <span class="recur-amount">${fmtMoney(r.amount, { decimals: 2 })}</span>
+        <span>${escapeHtml(r.note || '—')}</span>
+        <span style="font-size:11px;color:var(--text-dim)">${escapeHtml(acctLabel)}</span>
+        <span style="font-size:11px;color:var(--text-dim)">${escapeHtml(catLabel)}</span>
+        <span class="recur-next">${escapeHtml(r.schedule)} · next ${r.nextRun || '—'}</span>
+        <button class="set-add" data-act="run">run now</button>
+        <button class="task-del" data-act="del">×</button>
+      `;
+      row.querySelector('[data-act="run"]').onclick = () => runRecurringNow(r.id);
+      row.querySelector('[data-act="del"]').onclick = () => deleteRecurring(r.id);
+      list.appendChild(row);
+    });
+  }
+
+  window.addRecurringTx = () => {
+    const type = document.getElementById('fin-recur-type').value;
+    const amount = Number(document.getElementById('fin-recur-amount').value);
+    const accountId = document.getElementById('fin-recur-account').value;
+    const toAccountId = document.getElementById('fin-recur-to-account').value;
+    const categoryId = document.getElementById('fin-recur-category').value;
+    const schedule = document.getElementById('fin-recur-schedule').value;
+    const dayOfMonth = parseInt(document.getElementById('fin-recur-day').value, 10) || 1;
+    const note = document.getElementById('fin-recur-note').value.trim();
+
+    if (!Number.isFinite(amount) || amount <= 0) { alert('Enter a positive amount.'); return; }
+    if (!accountId) { alert('Pick an account.'); return; }
+    if (type === 'transfer' && !toAccountId) { alert('Pick a destination account.'); return; }
+    if (type === 'transfer' && toAccountId === accountId) { alert('From and to must differ.'); return; }
+
+    const rec = {
+      id: uid(),
+      type,
+      amount: Math.abs(amount),
+      accountId,
+      note,
+      schedule,
+      dayOfMonth: schedule === 'monthly' || schedule === 'yearly' ? dayOfMonth : null,
+      lastRun: null,
+      nextRun: computeNextRunDate(schedule, dayOfMonth, todayStr()),
+      createdAt: todayStr()
+    };
+    if (type === 'transfer') rec.toAccountId = toAccountId;
+    else rec.categoryId = categoryId || null;
+    state.recurring.push(rec);
+
+    document.getElementById('fin-recur-amount').value = '';
+    document.getElementById('fin-recur-note').value = '';
+    debouncedSave();
+    renderRecurring();
+    renderFinance();
+  };
+
+  window.runRecurringNow = (id) => {
+    const r = state.recurring.find(x => x.id === id);
+    if (!r) return;
+    const tx = {
+      id: uid(),
+      date: todayStr(),
+      amount: Math.abs(Number(r.amount) || 0),
+      type: r.type,
+      accountId: r.accountId,
+      note: r.note ? `${r.note} (manual)` : '(manual)',
+      recurringId: r.id
+    };
+    if (r.type === 'transfer') tx.toAccountId = r.toAccountId;
+    else tx.categoryId = r.categoryId || null;
+    state.finance.transactions.push(tx);
+    r.lastRun = todayStr();
+    r.nextRun = computeNextRunDate(r.schedule, r.dayOfMonth, todayStr());
+    debouncedSave();
+    renderRecurring();
+    renderFinance();
+  };
+
+  window.deleteRecurring = (id) => {
+    const r = state.recurring.find(x => x.id === id);
+    if (!r) return;
+    if (!confirm(`Delete recurring "${r.note || r.type}"? Past transactions stay.`)) return;
+    state.recurring = state.recurring.filter(x => x.id !== id);
+    debouncedSave();
+    renderRecurring();
+    renderFinance();
+  };
+
   // EXPORT
   window.exportData = () => {
     const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
@@ -4562,7 +5128,10 @@ const firebaseConfig = {
         ensureBigThreeShape();
         ensureGoalsShape();
         ensureAiShape();
+        ensurePeopleShape();
+        ensureRecurringShape();
         applyDailyResets();
+        runRecurringExpansion();
         await setDoc(userDocRef, state);
       } else {
         state = emptyState();
@@ -4584,6 +5153,8 @@ const firebaseConfig = {
           ensureBigThreeShape();
           ensureGoalsShape();
           ensureAiShape();
+          ensurePeopleShape();
+          ensureRecurringShape();
           renderAll();
         }
       });
@@ -4623,6 +5194,9 @@ const firebaseConfig = {
     renderGoals();
     renderTodayLanding();
     renderIntel();
+    renderMorningBrief();
+    renderPeople();
+    renderRecurring();
   }
 
   async function init() {
