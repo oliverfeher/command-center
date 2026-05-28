@@ -416,6 +416,39 @@
   .kr-meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-dim); margin-top: 2px; }
   .kr-add-row { display: grid; grid-template-columns: 1fr 60px 60px auto; gap: 6px; margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border); }
   .kr-add-row input { padding: 6px 8px; font-size: 12px; }
+
+  /* AI / Intel */
+  .ai-digest { font-size: 13px; line-height: 1.6; color: var(--text); padding: 14px; background: var(--bg); border: 1px solid var(--border); min-height: 80px; max-height: 600px; overflow-y: auto; }
+  .ai-digest .empty { padding: 0; }
+  .ai-digest h1, .ai-digest h2, .ai-digest h3 { font-family: 'Fraunces', serif; font-weight: 500; margin: 14px 0 6px; line-height: 1.2; }
+  .ai-digest h1 { font-size: 18px; color: var(--gold); }
+  .ai-digest h2 { font-size: 16px; color: var(--text); margin-top: 18px; }
+  .ai-digest h3 { font-size: 14px; color: var(--text-dim); }
+  .ai-digest p { margin: 6px 0; }
+  .ai-digest ul, .ai-digest ol { margin: 6px 0 6px 18px; }
+  .ai-digest li { margin: 2px 0; }
+  .ai-digest strong { color: var(--gold); font-weight: 500; }
+  .ai-digest code { background: var(--bg-elev); padding: 1px 5px; font-size: 11px; color: var(--green); }
+  .ai-ask-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+  .ai-ask-row input { padding: 10px 12px; font-size: 13px; }
+  .ai-qa-item { border: 1px solid var(--border); padding: 12px 14px; margin-bottom: 10px; }
+  .ai-qa-item .q { font-family: 'Fraunces', serif; font-size: 14px; color: var(--gold); margin-bottom: 8px; }
+  .ai-qa-item .a { font-size: 12px; line-height: 1.6; color: var(--text); white-space: pre-wrap; }
+  .ai-qa-item .ts { font-size: 9px; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.15em; margin-top: 8px; display: flex; justify-content: space-between; }
+  .ai-qa-item .a h1, .ai-qa-item .a h2, .ai-qa-item .a h3 { font-family: 'Fraunces', serif; font-weight: 500; margin: 8px 0 4px; }
+  .ai-qa-item .a ul, .ai-qa-item .a ol { margin: 4px 0 4px 16px; }
+  .ai-qa-item .a strong { color: var(--gold); }
+  .ai-qa-item .a code { background: var(--bg-elev); padding: 1px 4px; font-size: 11px; color: var(--green); }
+  .ai-settings-row { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; }
+  .ai-settings-row label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--text-dim); width: 80px; flex-shrink: 0; }
+  .ai-settings-row input, .ai-settings-row select { padding: 8px 10px; font-size: 12px; }
+  .b3-suggestion-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px dashed var(--border); }
+  .b3-suggestion-row:last-child { border-bottom: none; }
+  .b3-suggestion-row .text { font-family: 'Fraunces', serif; font-size: 14px; }
+  .b3-suggestion-row .why { font-size: 10px; color: var(--text-dim); margin-top: 2px; }
+  .ai-loading { font-style: italic; color: var(--gold); font-size: 12px; }
+  .ai-loading::after { content: '...'; animation: dot-blink 1.2s infinite; }
+  @keyframes dot-blink { 0%, 20% { content: '.'; } 40% { content: '..'; } 60%, 100% { content: '...'; } }
 </style>
 </head>
 <body>
@@ -458,14 +491,16 @@
   <button class="tab" data-view="goals" onclick="showView('goals')">Goals</button>
   <button class="tab" data-view="workouts" onclick="showView('workouts')">Workouts</button>
   <button class="tab" data-view="finance" onclick="showView('finance')">Finance</button>
+  <button class="tab" data-view="intel" onclick="showView('intel')">Intel</button>
 </nav>
 
 <div class="view" id="view-dashboard">
 
 <div class="card big-three-card" style="margin-bottom: 16px;">
   <div class="card-label">Today <span id="b3-streak" style="color:var(--gold);margin-left:8px"></span></div>
-  <div class="card-title">Big 3 <span class="meta" id="b3-meta">0 / 0</span></div>
+  <div class="card-title">Big 3 <span class="meta" id="b3-meta">0 / 0</span><button class="btn btn-sm btn-secondary" id="b3-suggest-btn" onclick="suggestBigThree()" style="margin-left:auto;font-size:10px">✦ Suggest</button></div>
   <div id="big-three-list"></div>
+  <div id="b3-suggestions" class="hidden" style="margin-top:12px;padding-top:12px;border-top:1px dashed var(--border)"></div>
 </div>
 
 <div class="card" style="margin-bottom: 16px;">
@@ -828,6 +863,61 @@
 
 </div><!-- /view-finance -->
 
+<div class="view hidden" id="view-intel">
+
+  <div class="card" style="margin-bottom: 16px;">
+    <div class="card-label">Synthesis</div>
+    <div class="card-title">Weekly Digest <span class="meta" id="ai-digest-meta">—</span></div>
+    <div id="ai-digest-content" class="ai-digest">
+      <div class="empty">No digest yet. Click below to generate one from this week's data.</div>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn" id="ai-digest-btn" onclick="generateWeeklyDigest()">Generate digest</button>
+      <button class="btn btn-secondary btn-sm" onclick="showDigestHistory()">Past digests</button>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom: 16px;">
+    <div class="card-label">Query</div>
+    <div class="card-title">Ask</div>
+    <div class="ai-ask-row">
+      <input type="text" id="ai-question" placeholder="How much did I spend on food this month? What's my squat trend?" onkeydown="if(event.key==='Enter')askQuestion()">
+      <button class="btn" onclick="askQuestion()">Ask</button>
+    </div>
+    <div id="ai-qa-list" style="margin-top:12px"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">Setup</div>
+    <div class="card-title">Settings</div>
+    <div style="margin-bottom: 14px; font-size: 11px; color: var(--text-dim); line-height: 1.5;">
+      Paste your Claude API key from <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:var(--gold)">console.anthropic.com</a>. Stored locally on this device only (never synced). Each call sends a concise summary of your tracked data to Anthropic.
+    </div>
+    <div class="ai-settings-row">
+      <label>API key</label>
+      <div style="display:flex;gap:6px;flex:1">
+        <input type="password" id="ai-api-key" placeholder="sk-ant-..." autocomplete="off" style="flex:1">
+        <button class="btn btn-sm btn-secondary" onclick="toggleApiKeyVisible()" id="ai-key-toggle">show</button>
+      </div>
+    </div>
+    <div class="ai-settings-row">
+      <label>Model</label>
+      <select id="ai-model" style="flex:1">
+        <option value="claude-sonnet-4-6">Sonnet 4.6 (recommended)</option>
+        <option value="claude-haiku-4-5-20251001">Haiku 4.5 (cheaper)</option>
+        <option value="claude-opus-4-7">Opus 4.7 (smartest, most expensive)</option>
+      </select>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-sm" onclick="saveAiSettings()">Save</button>
+      <button class="btn btn-sm btn-secondary" onclick="testAiConnection()">Test connection</button>
+      <span id="ai-settings-status" style="font-size:11px;color:var(--text-dim);align-self:center"></span>
+    </div>
+    <div id="ai-error" class="fin-error hidden" style="margin-top:10px"></div>
+  </div>
+
+</div><!-- /view-intel -->
+
 <footer class="footer">
   <span id="user-email">—</span>
   <span>Saved · <span id="last-saved">—</span></span>
@@ -884,6 +974,7 @@ const firebaseConfig = {
       finance: { accounts: [], categories: [], transactions: [] },
       bigThree: { items: [], history: {}, lastSeenDate: '' },
       goals: { yearly: [], objectives: [] },
+      ai: { weeklyDigests: {}, bigThreeSuggestions: {}, qaHistory: [] },
       lastDate: todayStr(), createdAt: todayStr()
     };
   }
@@ -914,6 +1005,13 @@ const firebaseConfig = {
     if (!state.goals || typeof state.goals !== 'object') state.goals = { yearly: [], objectives: [] };
     if (!Array.isArray(state.goals.yearly)) state.goals.yearly = [];
     if (!Array.isArray(state.goals.objectives)) state.goals.objectives = [];
+  }
+
+  function ensureAiShape() {
+    if (!state.ai || typeof state.ai !== 'object') state.ai = { weeklyDigests: {}, bigThreeSuggestions: {}, qaHistory: [] };
+    if (!state.ai.weeklyDigests || typeof state.ai.weeklyDigests !== 'object') state.ai.weeklyDigests = {};
+    if (!state.ai.bigThreeSuggestions || typeof state.ai.bigThreeSuggestions !== 'object') state.ai.bigThreeSuggestions = {};
+    if (!Array.isArray(state.ai.qaHistory)) state.ai.qaHistory = [];
   }
 
   let state = emptyState();
@@ -3455,6 +3553,460 @@ const firebaseConfig = {
     alert(`Imported ${added} transaction${added === 1 ? '' : 's'}${skipped > 0 ? '; skipped ' + skipped : ''}.`);
   };
 
+  // AI / INTEL
+  function getApiKey() { return localStorage.getItem('cc_anthropic_key') || ''; }
+  function getAiModel() { return localStorage.getItem('cc_ai_model') || 'claude-sonnet-4-6'; }
+
+  async function callClaude(userMessage, opts = {}) {
+    const apiKey = getApiKey();
+    if (!apiKey) throw new Error('No API key. Open Intel → Settings to add one.');
+    const model = getAiModel();
+    const body = {
+      model,
+      max_tokens: opts.maxTokens || 1500,
+      messages: [{ role: 'user', content: userMessage }]
+    };
+    if (opts.system) body.system = opts.system;
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) {
+      let detail = '';
+      try { const j = await res.json(); detail = j.error?.message || JSON.stringify(j); } catch {}
+      throw new Error(`API ${res.status}: ${detail || res.statusText}`);
+    }
+    const data = await res.json();
+    return (data.content && data.content[0]?.text) || '';
+  }
+
+  function buildAiContext() {
+    const lines = [];
+    const today = todayStr();
+    const dateObj = new Date();
+    lines.push(`# Personal data context`);
+    lines.push(`Date: ${today} (${dateObj.toLocaleDateString('en-US', { weekday: 'long' })})`);
+    lines.push('');
+
+    lines.push('## Big 3 today');
+    if (state.bigThree.items.length === 0) lines.push('(none set)');
+    state.bigThree.items.forEach((item, i) => lines.push(`${i + 1}. [${item.done ? 'x' : ' '}] ${item.text}`));
+    const streak = computeBigThreeStreak();
+    if (streak > 0) lines.push(`Streak: ${streak} consecutive days complete`);
+    const last7Big3 = [];
+    const d = new Date(today + 'T00:00:00');
+    for (let i = 1; i <= 7; i++) {
+      d.setDate(d.getDate() - 1);
+      const ds = localDateStr(d);
+      const rec = state.bigThree.history[ds];
+      if (rec && rec.length > 0) {
+        const done = rec.filter(r => r.done).length;
+        last7Big3.push(`  ${ds}: ${done}/${rec.length} done`);
+      }
+    }
+    if (last7Big3.length > 0) { lines.push('Last 7 days:'); lines.push(...last7Big3); }
+    lines.push('');
+
+    lines.push(`## Habits (${state.habits.filter(h => h.doneToday).length}/${state.habits.length} today)`);
+    state.habits.forEach(h => {
+      const s = getHabitStreak(h);
+      lines.push(`- ${h.name} — ${h.doneToday ? 'done' : 'pending'} today (streak: ${s})`);
+    });
+    lines.push('');
+
+    const openTasks = state.tasks.filter(t => !t.done);
+    lines.push(`## Tasks (${openTasks.length} open, ${state.tasks.filter(t => t.done).length} done)`);
+    const byPrio = { high: [], med: [], low: [] };
+    openTasks.forEach(t => byPrio[t.priority || 'med'].push(t));
+    ['high', 'med', 'low'].forEach(p => {
+      if (byPrio[p].length === 0) return;
+      lines.push(`### priority: ${p}`);
+      byPrio[p].slice(0, 12).forEach(t => {
+        const due = t.due ? ` (due ${t.due})` : '';
+        const cat = t.category && t.category !== 'General' ? ` [${t.category}]` : '';
+        lines.push(`- ${t.text}${due}${cat}`);
+      });
+      if (byPrio[p].length > 12) lines.push(`- ... and ${byPrio[p].length - 12} more`);
+    });
+    lines.push('');
+
+    const weekStart = new Date(today + 'T00:00:00');
+    weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+    const weekStartStr = localDateStr(weekStart);
+    const weekFocus = state.sessions.filter(s => s.date >= weekStartStr).reduce((sum, s) => sum + (Number(s.seconds) || 0), 0) / 3600;
+    const todayFocus = state.sessions.filter(s => s.date === today).reduce((sum, s) => sum + (Number(s.seconds) || 0), 0) / 3600;
+    lines.push('## Focus / Deep Work');
+    lines.push(`Today: ${todayFocus.toFixed(1)}h. This week: ${weekFocus.toFixed(1)}h.`);
+    lines.push('');
+
+    const recent4WStr = (() => { const x = new Date(today + 'T00:00:00'); x.setDate(x.getDate() - 28); return localDateStr(x); })();
+    const recentSessions = state.workout.sessions.filter(s => s.date >= recent4WStr).sort((a, b) => b.date.localeCompare(a.date));
+    lines.push(`## Workouts (last 4 weeks: ${recentSessions.length} sessions)`);
+    if (state.workout.split.name) lines.push(`Split: ${state.workout.split.name}`);
+    recentSessions.slice(0, 10).forEach(s => {
+      const topSet = s.entries.flatMap(e => e.sets).reduce((m, st) => Math.max(m, Number(st.weight) || 0), 0);
+      lines.push(`- ${s.date} ${s.dayName}: ${s.entries.length} exercises, top set ${topSet} lb`);
+    });
+    const exNames = new Set();
+    recentSessions.forEach(s => s.entries.forEach(e => exNames.add(e.exerciseName)));
+    if (exNames.size > 0) {
+      lines.push('Top set trend per exercise (last 5 sessions, lb):');
+      [...exNames].slice(0, 10).forEach(name => {
+        const points = [];
+        state.workout.sessions.forEach(s => {
+          const e = s.entries.find(en => en.exerciseName === name);
+          if (e && e.sets.length > 0) {
+            const top = e.sets.reduce((m, st) => Math.max(m, Number(st.weight) || 0), 0);
+            if (top > 0) points.push({ date: s.date, w: top });
+          }
+        });
+        points.sort((a, b) => a.date.localeCompare(b.date));
+        const last5 = points.slice(-5).map(p => p.w).join(' → ');
+        lines.push(`  - ${name}: ${last5 || '(no data)'}`);
+      });
+    }
+    lines.push('');
+
+    const thisMo = today.slice(0, 7);
+    const nw = state.finance.accounts.length > 0 ? computeNetWorth() : null;
+    const lastMonthEnd = new Date(new Date().getFullYear(), new Date().getMonth(), 0).toISOString().slice(0, 10);
+    const nwDelta = nw !== null ? nw - computeNetWorth(lastMonthEnd) : 0;
+    let moInc = 0, moExp = 0;
+    state.finance.transactions.forEach(t => {
+      if (t.date.slice(0, 7) !== thisMo) return;
+      if (t.type === 'income') moInc += Number(t.amount) || 0;
+      else if (t.type === 'expense') moExp += Number(t.amount) || 0;
+    });
+    lines.push('## Finance');
+    if (nw !== null) lines.push(`Net worth: $${nw.toFixed(0)} (${nwDelta >= 0 ? '+' : ''}$${nwDelta.toFixed(0)} MoM)`);
+    lines.push(`This month: $${moInc.toFixed(0)} in, $${moExp.toFixed(0)} out, $${(moInc - moExp).toFixed(0)} net`);
+    if (state.finance.accounts.length > 0) {
+      lines.push('Accounts:');
+      state.finance.accounts.forEach(a => {
+        const bal = computeAccountBalance(a);
+        lines.push(`  - ${a.name} (${a.type}): $${bal.toFixed(0)}${accountIsLiability(a) ? ' owed' : ''}`);
+      });
+    }
+    if (state.finance.categories.filter(c => c.type === 'expense').length > 0) {
+      lines.push('Expense categories this month:');
+      state.finance.categories.filter(c => c.type === 'expense').forEach(c => {
+        const spent = getMonthCategoryTotal(c.id, thisMo, 'expense');
+        const pctStr = c.monthlyCap > 0 ? ` / $${c.monthlyCap} (${Math.round((spent/c.monthlyCap)*100)}%)` : '';
+        lines.push(`  - ${c.name}: $${spent.toFixed(0)}${pctStr}`);
+      });
+    }
+    lines.push('');
+
+    const currentYear = new Date().getFullYear();
+    const currentQuarter = Math.floor(new Date().getMonth() / 3) + 1;
+    const currentQ = `${currentYear}-Q${currentQuarter}`;
+    lines.push('## Goals & OKRs');
+    const yearlyGoals = state.goals.yearly.filter(g => g.year === currentYear);
+    if (yearlyGoals.length > 0) {
+      lines.push(`### ${currentYear} Yearly Goals`);
+      yearlyGoals.forEach(g => lines.push(`- [${g.status}] [${g.category || 'other'}] ${g.text}`));
+    }
+    const currentObjs = state.goals.objectives.filter(o => o.quarter === currentQ);
+    if (currentObjs.length > 0) {
+      lines.push(`### ${currentQ} Objectives`);
+      currentObjs.forEach(o => {
+        const goal = state.goals.yearly.find(g => g.id === o.goalId);
+        lines.push(`- ${o.text}${goal ? ` (toward goal: ${goal.text})` : ''}`);
+        (o.keyResults || []).forEach(kr => {
+          const hasNum = Number.isFinite(kr.target);
+          const cur = Number.isFinite(kr.current) ? kr.current : 0;
+          const pct = hasNum && kr.target !== 0 ? Math.round((cur / kr.target) * 100) : (kr.done ? 100 : 0);
+          const status = hasNum ? `${cur}/${kr.target} (${pct}%)` : (kr.done ? 'done' : 'open');
+          lines.push(`  - KR: ${kr.text} — ${status}`);
+        });
+      });
+    }
+
+    return lines.join('\n');
+  }
+
+  function renderMarkdownLite(md) {
+    let html = escapeHtml(md || '');
+    const lines = html.split('\n');
+    const out = [];
+    let inList = false, listType = null;
+    for (const line of lines) {
+      const trim = line.trim();
+      let m;
+      if ((m = line.match(/^(#{1,3}) (.+)$/))) {
+        if (inList) { out.push(`</${listType}>`); inList = false; }
+        const tag = `h${m[1].length}`;
+        out.push(`<${tag}>${m[2]}</${tag}>`);
+      } else if ((m = line.match(/^[-*] (.+)$/))) {
+        if (!inList || listType !== 'ul') {
+          if (inList) out.push(`</${listType}>`);
+          out.push('<ul>'); listType = 'ul'; inList = true;
+        }
+        out.push(`<li>${m[1]}</li>`);
+      } else if ((m = line.match(/^\d+\. (.+)$/))) {
+        if (!inList || listType !== 'ol') {
+          if (inList) out.push(`</${listType}>`);
+          out.push('<ol>'); listType = 'ol'; inList = true;
+        }
+        out.push(`<li>${m[1]}</li>`);
+      } else if (trim === '') {
+        if (inList) { out.push(`</${listType}>`); inList = false; }
+        out.push('');
+      } else {
+        if (inList) { out.push(`</${listType}>`); inList = false; }
+        out.push(line);
+      }
+    }
+    if (inList) out.push(`</${listType}>`);
+    let result = out.join('\n');
+    result = result.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
+    result = result.replace(/`([^`\n]+)`/g, '<code>$1</code>');
+    return result.split(/\n{2,}/).map(p => {
+      p = p.trim();
+      if (!p) return '';
+      if (p.startsWith('<')) return p;
+      return `<p>${p.replace(/\n/g, '<br>')}</p>`;
+    }).join('\n');
+  }
+
+  function isoWeekKey() {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+    const yearStart = new Date(d.getFullYear(), 0, 1);
+    const weekNum = Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
+    return `${d.getFullYear()}-W${String(weekNum).padStart(2, '0')}`;
+  }
+
+  function renderIntel() {
+    ensureAiShape();
+    const keyEl = document.getElementById('ai-api-key');
+    if (keyEl && document.activeElement !== keyEl) keyEl.value = getApiKey();
+    const modelEl = document.getElementById('ai-model');
+    if (modelEl && document.activeElement !== modelEl) modelEl.value = getAiModel();
+    renderDigest();
+    renderQA();
+  }
+
+  function renderDigest() {
+    const content = document.getElementById('ai-digest-content');
+    const meta = document.getElementById('ai-digest-meta');
+    if (!content) return;
+    const wk = isoWeekKey();
+    const digest = state.ai.weeklyDigests[wk];
+    if (!digest) {
+      content.innerHTML = '<div class="empty">No digest yet for this week. Click below to generate.</div>';
+      meta.textContent = '';
+      return;
+    }
+    content.innerHTML = renderMarkdownLite(digest.content);
+    meta.textContent = `${wk} · generated ${new Date(digest.generatedAt).toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' })}`;
+  }
+
+  function renderQA() {
+    const list = document.getElementById('ai-qa-list');
+    if (!list) return;
+    list.innerHTML = '';
+    if (state.ai.qaHistory.length === 0) {
+      list.innerHTML = '<div class="empty" style="font-size:11px;padding:8px">No questions yet.</div>';
+      return;
+    }
+    state.ai.qaHistory.slice(0, 10).forEach(entry => {
+      const item = document.createElement('div');
+      item.className = 'ai-qa-item';
+      const answerHtml = entry.answer === '__loading__'
+        ? '<div class="ai-loading">Thinking</div>'
+        : `<div class="a">${renderMarkdownLite(entry.answer)}</div>`;
+      item.innerHTML = `
+        <div class="q">${escapeHtml(entry.question)}</div>
+        ${answerHtml}
+        <div class="ts"><span>${new Date(entry.ts).toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' })}</span><a href="#" data-act="del" style="color:var(--text-faint)">delete</a></div>
+      `;
+      item.querySelector('[data-act="del"]').onclick = (e) => {
+        e.preventDefault();
+        state.ai.qaHistory = state.ai.qaHistory.filter(x => x.id !== entry.id);
+        debouncedSave();
+        renderQA();
+      };
+      list.appendChild(item);
+    });
+  }
+
+  window.saveAiSettings = () => {
+    const key = document.getElementById('ai-api-key').value.trim();
+    const model = document.getElementById('ai-model').value;
+    if (key) localStorage.setItem('cc_anthropic_key', key);
+    else localStorage.removeItem('cc_anthropic_key');
+    localStorage.setItem('cc_ai_model', model);
+    const status = document.getElementById('ai-settings-status');
+    status.textContent = 'Saved.';
+    setTimeout(() => { if (status.textContent === 'Saved.') status.textContent = ''; }, 2000);
+  };
+
+  window.testAiConnection = async () => {
+    const status = document.getElementById('ai-settings-status');
+    const err = document.getElementById('ai-error');
+    err.classList.add('hidden'); err.textContent = '';
+    status.textContent = 'Testing…';
+    try {
+      const reply = await callClaude('Reply with the single word "ok".', { maxTokens: 20 });
+      status.textContent = 'Connected. Reply: ' + reply.trim().slice(0, 50);
+    } catch (e) {
+      status.textContent = '';
+      err.textContent = e.message;
+      err.classList.remove('hidden');
+    }
+  };
+
+  window.toggleApiKeyVisible = () => {
+    const input = document.getElementById('ai-api-key');
+    const btn = document.getElementById('ai-key-toggle');
+    if (input.type === 'password') { input.type = 'text'; btn.textContent = 'hide'; }
+    else { input.type = 'password'; btn.textContent = 'show'; }
+  };
+
+  window.generateWeeklyDigest = async () => {
+    const btn = document.getElementById('ai-digest-btn');
+    const content = document.getElementById('ai-digest-content');
+    btn.disabled = true;
+    const oldText = btn.textContent;
+    btn.textContent = 'Generating…';
+    content.innerHTML = '<div class="ai-loading">Generating weekly digest</div>';
+    try {
+      const context = buildAiContext();
+      const system = `You are a chief-of-staff brief for a user trying to live a hyper-focused, hyper-successful life. You write concise weekly digests in markdown. Be direct, surface signal not noise, name specifically what went well and what slipped, and end with 1-3 concrete priorities for next week tied to existing goals/KRs when possible.`;
+      const userMessage = `Here is my tracked data:\n\n${context}\n\nWrite my weekly digest. Use markdown with section headers. Keep it under 400 words. Cover: wins, slips, surprising patterns, top 3 priorities for next week.`;
+      const reply = await callClaude(userMessage, { system, maxTokens: 1500 });
+      const wk = isoWeekKey();
+      state.ai.weeklyDigests[wk] = { content: reply, generatedAt: new Date().toISOString() };
+      debouncedSave();
+      renderDigest();
+    } catch (e) {
+      content.innerHTML = `<div class="fin-error">${escapeHtml(e.message)}</div>`;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = oldText;
+    }
+  };
+
+  window.askQuestion = async () => {
+    const input = document.getElementById('ai-question');
+    const q = input.value.trim();
+    if (!q) return;
+    input.value = '';
+    const id = uid();
+    state.ai.qaHistory.unshift({ id, question: q, answer: '__loading__', ts: Date.now() });
+    if (state.ai.qaHistory.length > 50) state.ai.qaHistory.length = 50;
+    renderQA();
+    try {
+      const context = buildAiContext();
+      const system = `You are an honest, direct analyst answering questions about a user's personal tracking data. Use markdown. Be specific with numbers from the data. If the data doesn't contain the answer, say so plainly.`;
+      const userMessage = `My tracked data:\n\n${context}\n\n---\n\nQuestion: ${q}`;
+      const reply = await callClaude(userMessage, { system, maxTokens: 1500 });
+      const entry = state.ai.qaHistory.find(e => e.id === id);
+      if (entry) entry.answer = reply;
+      debouncedSave();
+      renderQA();
+    } catch (e) {
+      const entry = state.ai.qaHistory.find(en => en.id === id);
+      if (entry) entry.answer = 'Error: ' + e.message;
+      renderQA();
+    }
+  };
+
+  window.suggestBigThree = async () => {
+    const btn = document.getElementById('b3-suggest-btn');
+    const container = document.getElementById('b3-suggestions');
+    if (!getApiKey()) {
+      container.classList.remove('hidden');
+      container.innerHTML = '<div class="fin-error">Add a Claude API key in Intel → Settings to use suggestions.</div>';
+      return;
+    }
+    btn.disabled = true;
+    const oldText = btn.textContent;
+    btn.textContent = '…';
+    container.classList.remove('hidden');
+    container.innerHTML = '<div class="ai-loading">Suggesting Big 3</div>';
+    try {
+      const context = buildAiContext();
+      const system = `You suggest the user's "Big 3" — exactly 3 most leveraged things they should accomplish today. Base on open high-priority tasks, KRs that need progress, habit streaks at risk, and any near deadlines. Return ONLY a JSON array of 3 objects: [{"text":"...","why":"..."}]. No prose around it. The "why" should reference specific data (e.g. "KR weight at 60%", "tax deadline in 3 days").`;
+      const userMessage = `Today is ${todayStr()}. Data:\n\n${context}\n\nReturn 3 Big 3 suggestions as JSON.`;
+      const reply = await callClaude(userMessage, { system, maxTokens: 600 });
+      const m = reply.match(/\[[\s\S]*\]/);
+      if (!m) throw new Error('Could not parse suggestions from reply.');
+      const suggestions = JSON.parse(m[0]);
+      state.ai.bigThreeSuggestions[todayStr()] = { items: suggestions, generatedAt: new Date().toISOString() };
+      debouncedSave();
+      renderSuggestions(suggestions);
+    } catch (e) {
+      container.innerHTML = `<div class="fin-error">${escapeHtml(e.message)}</div>`;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = oldText;
+    }
+  };
+
+  function renderSuggestions(suggestions) {
+    const container = document.getElementById('b3-suggestions');
+    if (!container) return;
+    container.innerHTML = '<div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.2em;margin-bottom:8px">AI Suggestions</div>'
+      + suggestions.map((s, i) => `
+        <div class="b3-suggestion-row">
+          <div>
+            <div class="text">${escapeHtml(s.text || '')}</div>
+            <div class="why">${escapeHtml(s.why || '')}</div>
+          </div>
+          <button class="btn btn-sm btn-secondary" data-idx="${i}">Use</button>
+        </div>
+      `).join('')
+      + '<button class="btn btn-sm btn-secondary" onclick="dismissSuggestions()" style="margin-top:8px;font-size:10px">Dismiss</button>';
+    container.querySelectorAll('[data-idx]').forEach(btn => {
+      btn.onclick = () => {
+        const idx = parseInt(btn.dataset.idx, 10);
+        const s = suggestions[idx];
+        if (state.bigThree.items.length >= 3) {
+          alert('Big 3 is full. Remove an item first.');
+          return;
+        }
+        state.bigThree.items.push({ id: uid(), text: s.text, done: false, createdAt: todayStr() });
+        debouncedSave();
+        renderBigThree();
+        btn.disabled = true;
+        btn.textContent = '✓';
+      };
+    });
+  }
+
+  window.dismissSuggestions = () => {
+    document.getElementById('b3-suggestions').classList.add('hidden');
+  };
+
+  window.showDigestHistory = () => {
+    const list = Object.entries(state.ai.weeklyDigests).sort((a, b) => b[0].localeCompare(a[0]));
+    if (list.length === 0) {
+      showModal('<h3>Past Digests</h3><div class="empty">No digests yet.</div><div class="modal-actions"><button class="btn" onclick="closeModal()">Close</button></div>');
+      return;
+    }
+    showModal(`
+      <h3>Past Digests</h3>
+      <div style="max-height: 60vh; overflow-y: auto;">
+        ${list.map(([key, digest]) => `
+          <div style="border:1px solid var(--border);padding:12px;margin-bottom:10px">
+            <div style="font-size:10px;color:var(--gold);text-transform:uppercase;letter-spacing:0.2em;margin-bottom:8px">${key} · ${new Date(digest.generatedAt).toLocaleDateString()}</div>
+            <div class="ai-digest" style="background:transparent;border:none;padding:0;min-height:0">${renderMarkdownLite(digest.content)}</div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="modal-actions"><button class="btn" onclick="closeModal()">Close</button></div>
+    `);
+  };
+
   // TODAY LANDING
   window.scrollToEl = (id) => {
     const el = document.getElementById(id);
@@ -4009,6 +4561,7 @@ const firebaseConfig = {
         ensureFinanceShape();
         ensureBigThreeShape();
         ensureGoalsShape();
+        ensureAiShape();
         applyDailyResets();
         await setDoc(userDocRef, state);
       } else {
@@ -4030,6 +4583,7 @@ const firebaseConfig = {
           ensureFinanceShape();
           ensureBigThreeShape();
           ensureGoalsShape();
+          ensureAiShape();
           renderAll();
         }
       });
@@ -4068,6 +4622,7 @@ const firebaseConfig = {
     renderBigThree();
     renderGoals();
     renderTodayLanding();
+    renderIntel();
   }
 
   async function init() {
