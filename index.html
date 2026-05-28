@@ -366,6 +366,17 @@
   .fin-csv-preview { max-height: 240px; overflow-y: auto; border: 1px solid var(--border); margin-top: 12px; }
   .fin-error { color: var(--accent); font-size: 11px; margin-top: 8px; padding: 8px; border: 1px solid var(--accent); background: rgba(230, 57, 70, 0.05); }
 
+  /* Today landing tiles */
+  .today-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+  .today-tile { background: var(--bg); border: 1px solid var(--border); padding: 12px 14px; cursor: pointer; transition: border-color 0.15s, transform 0.15s; }
+  .today-tile:hover { border-color: var(--gold); transform: translateY(-1px); }
+  .today-tile .label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--text-dim); margin-bottom: 6px; }
+  .today-tile .num { font-family: 'Fraunces', serif; font-size: 24px; font-weight: 500; line-height: 1; color: var(--text); }
+  .today-tile .num.ok { color: var(--green); }
+  .today-tile .num.warn { color: var(--gold); }
+  .today-tile .num.alert { color: var(--accent); }
+  .today-tile .sub { font-size: 10px; color: var(--text-dim); margin-top: 6px; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.05em; }
+
   /* Big 3 */
   .big-three-card { background: linear-gradient(180deg, var(--bg-card) 0%, var(--bg-elev) 100%); border-color: var(--border-bright); }
   .big-three-item { display: grid; grid-template-columns: 28px 22px 1fr auto; gap: 12px; padding: 14px 0; border-bottom: 1px dashed var(--border); align-items: center; }
@@ -455,6 +466,12 @@
   <div class="card-label">Today <span id="b3-streak" style="color:var(--gold);margin-left:8px"></span></div>
   <div class="card-title">Big 3 <span class="meta" id="b3-meta">0 / 0</span></div>
   <div id="big-three-list"></div>
+</div>
+
+<div class="card" style="margin-bottom: 16px;">
+  <div class="card-label">Status</div>
+  <div class="card-title">At a Glance</div>
+  <div class="today-tiles" id="today-tiles"></div>
 </div>
 
 <div class="countdowns" id="countdowns"></div>
@@ -3438,6 +3455,154 @@ const firebaseConfig = {
     alert(`Imported ${added} transaction${added === 1 ? '' : 's'}${skipped > 0 ? '; skipped ' + skipped : ''}.`);
   };
 
+  // TODAY LANDING
+  window.scrollToEl = (id) => {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
+
+  function renderTodayLanding() {
+    const container = document.getElementById('today-tiles');
+    if (!container) return;
+    ensureFinanceShape();
+    ensureGoalsShape();
+    ensureWorkoutShape();
+
+    const today = todayStr();
+
+    const habitTotal = state.habits.length;
+    const habitDone = state.habits.filter(h => h.doneToday).length;
+    const habitPct = habitTotal > 0 ? Math.round((habitDone / habitTotal) * 100) : 0;
+
+    const focusSeconds = state.sessions
+      .filter(s => s.date === today)
+      .reduce((sum, s) => sum + (Number(s.seconds) || 0), 0);
+    const focusHours = focusSeconds / 3600;
+
+    const wsessions = state.workout.sessions;
+    let lastWorkoutDate = null;
+    wsessions.forEach(s => { if (!lastWorkoutDate || s.date > lastWorkoutDate) lastWorkoutDate = s.date; });
+    const daysSinceWorkout = lastWorkoutDate
+      ? Math.floor((new Date(today + 'T00:00:00') - new Date(lastWorkoutDate + 'T00:00:00')) / 86400000)
+      : null;
+
+    const thisMo = today.slice(0, 7);
+    const spent = state.finance.transactions
+      .filter(t => t.type === 'expense' && t.date.slice(0, 7) === thisMo)
+      .reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
+    const totalCap = state.finance.categories
+      .filter(c => c.type === 'expense')
+      .reduce((sum, c) => sum + (Number(c.monthlyCap) || 0), 0);
+
+    const nw = state.finance.accounts.length > 0 || state.finance.transactions.length > 0 ? computeNetWorth() : null;
+    const lastMonthEnd = new Date(new Date().getFullYear(), new Date().getMonth(), 0).toISOString().slice(0, 10);
+    const nwDelta = nw !== null ? (nw - computeNetWorth(lastMonthEnd)) : 0;
+
+    const openTasks = state.tasks.filter(t => !t.done);
+    const highPriority = openTasks.filter(t => t.priority === 'high').length;
+    const dueTasks = openTasks.filter(t => t.due).sort((a, b) => a.due.localeCompare(b.due));
+    const nextDue = dueTasks[0];
+    const daysToDue = nextDue
+      ? Math.round((new Date(nextDue.due + 'T00:00:00') - new Date(today + 'T00:00:00')) / 86400000)
+      : null;
+
+    let krCount = 0, krBehind = 0;
+    state.goals.objectives.forEach(o => {
+      (o.keyResults || []).forEach(kr => {
+        krCount++;
+        if (Number.isFinite(kr.target) && kr.target !== 0 && Number.isFinite(kr.current)) {
+          const pct = (kr.current / kr.target) * 100;
+          if (pct < 50) krBehind++;
+        } else if (!kr.done) {
+          krBehind++;
+        }
+      });
+    });
+
+    const spendCls = totalCap > 0 && spent > totalCap ? 'alert' : (totalCap > 0 && spent > totalCap * 0.85 ? 'warn' : '');
+    const habitCls = habitTotal > 0 && habitDone === habitTotal ? 'ok' : (habitTotal > 0 && habitDone === 0 ? 'warn' : '');
+    const focusCls = focusHours >= 2 ? 'ok' : (focusHours >= 1 ? '' : 'warn');
+    const workoutCls = daysSinceWorkout === null ? '' : (daysSinceWorkout === 0 ? 'ok' : (daysSinceWorkout > 2 ? 'alert' : 'warn'));
+    const nwCls = nw === null ? '' : (nwDelta > 0 ? 'ok' : (nwDelta < 0 ? 'alert' : ''));
+    const taskCls = highPriority > 0 ? 'warn' : '';
+    const krCls = krBehind === 0 && krCount > 0 ? 'ok' : (krBehind > 0 ? 'warn' : '');
+
+    let workoutNum = '—';
+    if (daysSinceWorkout === 0) workoutNum = 'today';
+    else if (daysSinceWorkout === 1) workoutNum = '1d ago';
+    else if (daysSinceWorkout !== null) workoutNum = `${daysSinceWorkout}d ago`;
+
+    let taskSub = 'no due dates';
+    if (nextDue) {
+      if (daysToDue < 0) taskSub = `${Math.abs(daysToDue)}d overdue`;
+      else if (daysToDue === 0) taskSub = 'due today';
+      else taskSub = `${daysToDue}d to next due`;
+    }
+    if (highPriority > 0) taskSub = `${highPriority} high · ` + taskSub;
+
+    const tiles = [
+      {
+        label: 'Habits',
+        num: habitTotal > 0 ? `${habitDone}/${habitTotal}` : '—',
+        sub: habitTotal === 0 ? 'none yet' : `${habitPct}% today`,
+        cls: habitCls,
+        action: `scrollToEl('habits-list')`
+      },
+      {
+        label: 'Focus',
+        num: `${focusHours.toFixed(1)}h`,
+        sub: 'deep work today',
+        cls: focusCls,
+        action: `scrollToEl('timer-display')`
+      },
+      {
+        label: 'Workout',
+        num: workoutNum,
+        sub: lastWorkoutDate || 'no sessions',
+        cls: workoutCls,
+        action: `showView('workouts')`
+      },
+      {
+        label: 'Spend (mo)',
+        num: fmtMoney(spent, { decimals: 0 }),
+        sub: totalCap > 0 ? `of ${fmtMoney(totalCap, { decimals: 0 })}` : 'no caps set',
+        cls: spendCls,
+        action: `showView('finance')`
+      },
+      {
+        label: 'Net Worth',
+        num: nw === null ? '—' : fmtMoney(nw, { decimals: 0 }),
+        sub: nw === null ? 'no accounts' : `${nwDelta >= 0 ? '+' : ''}${fmtMoney(nwDelta, { decimals: 0 })} MoM`,
+        cls: nwCls,
+        action: `showView('finance')`
+      },
+      {
+        label: 'Open Tasks',
+        num: String(openTasks.length),
+        sub: taskSub,
+        cls: taskCls,
+        action: `scrollToEl('task-list')`
+      }
+    ];
+    if (krCount > 0) {
+      tiles.push({
+        label: 'Key Results',
+        num: `${krCount - krBehind}/${krCount}`,
+        sub: krBehind > 0 ? `${krBehind} behind` : 'all on track',
+        cls: krCls,
+        action: `showView('goals')`
+      });
+    }
+
+    container.innerHTML = tiles.map(t => `
+      <div class="today-tile" onclick="${t.action}">
+        <div class="label">${t.label}</div>
+        <div class="num ${t.cls}">${t.num}</div>
+        <div class="sub">${t.sub}</div>
+      </div>
+    `).join('');
+  }
+
   // BIG THREE
   function renderBigThree() {
     ensureBigThreeShape();
@@ -3902,6 +4067,7 @@ const firebaseConfig = {
     renderFinance();
     renderBigThree();
     renderGoals();
+    renderTodayLanding();
   }
 
   async function init() {
