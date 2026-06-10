@@ -453,6 +453,116 @@
   /* Morning Brief */
   .morning-brief-card { background: linear-gradient(180deg, var(--bg-card) 0%, rgba(212, 165, 116, 0.04) 100%); border-color: var(--border-bright); }
 
+  /* Ventures portfolio */
+  .ventures-summary-card { background: linear-gradient(180deg, var(--bg-card) 0%, rgba(230, 57, 70, 0.05) 100%); border-color: var(--border-bright); transition: border-color 0.15s; }
+  .ventures-summary-card:hover { border-color: var(--accent); }
+  .vs-line { display: grid; grid-template-columns: 100px 130px 1fr; gap: 12px; padding: 8px 0; border-bottom: 1px dashed var(--border); align-items: baseline; font-size: 12px; }
+  .vs-line:last-child { border-bottom: none; }
+  .vs-tag { font-size: 9px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--text-dim); }
+  .vs-line.vs-main .vs-tag { color: var(--accent); }
+  .vs-line.vs-lean .vs-tag { color: var(--green); }
+  .vs-line.vs-protected .vs-tag { color: var(--text-dim); }
+  .vs-line.vs-killed .vs-tag { color: var(--text-faint); }
+  .vs-line .vs-name { font-family: 'Fraunces', serif; font-size: 14px; }
+  .vs-line .vs-detail { font-size: 11px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
+  .vs-line.vs-main .vs-detail strong { color: var(--gold); }
+
+  /* Main bet card / Tier styling */
+  .main-bet-card { border-left: 3px solid var(--accent); }
+  .lean-card { border-left: 3px solid var(--green); }
+  .protected-card { border-left: 3px solid var(--text-dim); }
+  .killed-card { border-left: 3px solid var(--text-faint); }
+
+  /* Exam Sprint */
+  .exam-hero { display: flex; align-items: center; gap: 24px; padding: 14px 0 18px; border-bottom: 1px dashed var(--border); margin-bottom: 18px; }
+  .exam-hero-num { font-family: 'Fraunces', serif; font-size: 64px; font-weight: 300; line-height: 1; color: var(--gold); }
+  .exam-hero-num.warn { color: var(--warn); }
+  .exam-hero-num.urgent { color: var(--accent); }
+  .exam-hero-label .big { font-family: 'Fraunces', serif; font-size: 16px; color: var(--text); }
+  .exam-hero-label .sub { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.15em; margin-top: 4px; }
+
+  .exam-stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 18px; }
+  @media (max-width: 800px) { .exam-stats-row { grid-template-columns: 1fr; } }
+  .exam-stat { border: 1px solid var(--border); padding: 12px 14px; }
+  .exam-stat .label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--text-dim); margin-bottom: 6px; }
+  .exam-stat .val { font-family: 'Fraunces', serif; font-size: 20px; }
+  .exam-stat .val .sub { font-size: 11px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
+  .exam-stat .sub { font-size: 10px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
+  .exam-stat .bar { height: 4px; background: var(--border); margin-top: 8px; }
+  .exam-stat .bar-fill { height: 100%; background: var(--gold); transition: width 0.2s; }
+  .exam-stat .bar-fill.over { background: var(--green); }
+
+  .exam-section { margin-top: 18px; }
+  .exam-domain-row { display: grid; grid-template-columns: 1fr 90px 80px 1fr; gap: 10px; align-items: center; padding: 6px 0; border-bottom: 1px dashed var(--border); font-size: 12px; }
+  .exam-domain-row:last-child { border-bottom: none; }
+  .exam-domain-row .name { font-size: 12px; }
+  .exam-domain-row .target-tag { font-size: 10px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
+  .exam-domain-row .hours { font-family: 'Fraunces', serif; font-size: 14px; color: var(--gold); }
+  .exam-domain-row .domain-bar { height: 4px; background: var(--border); }
+  .exam-domain-row .domain-bar-fill { height: 100%; background: var(--gold); }
+  .exam-domain-row .domain-bar-fill.weak { background: var(--accent); }
+
+  .exam-mock-row { display: grid; grid-template-columns: 90px 70px 1fr 1fr auto; gap: 10px; align-items: baseline; padding: 6px 0; border-bottom: 1px dashed var(--border); font-size: 12px; }
+  .exam-mock-row:last-child { border-bottom: none; }
+  .exam-mock-row .mock-date { color: var(--gold); font-size: 11px; }
+  .exam-mock-row .mock-score { font-family: 'Fraunces', serif; font-size: 16px; }
+  .exam-mock-row .mock-score.pass { color: var(--green); }
+  .exam-mock-row .mock-score.fail { color: var(--accent); }
+
+  .exam-protocol-banner { margin-top: 18px; padding: 14px 16px; border: 1px solid var(--warn); background: rgba(233, 196, 106, 0.08); font-size: 12px; line-height: 1.6; }
+  .exam-protocol-banner ul { margin: 6px 0 0 20px; }
+  .exam-protocol-banner strong { color: var(--warn); }
+
+  /* MLO milestones */
+  .milestone-row { display: grid; grid-template-columns: 24px 1fr auto auto; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px dashed var(--border); }
+  .milestone-row:last-child { border-bottom: none; }
+  .milestone-check { width: 18px; height: 18px; border: 1.5px solid var(--border-bright); cursor: pointer; background: transparent; padding: 0; position: relative; }
+  .milestone-check.done { background: var(--green); border-color: var(--green); }
+  .milestone-check.done::after { content: '✓'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--bg); font-size: 11px; font-weight: 700; }
+  .milestone-text { font-size: 13px; }
+  .milestone-text.done { text-decoration: line-through; color: var(--text-faint); }
+
+  /* MLO leads */
+  .mlo-lead-row { display: grid; grid-template-columns: 1fr 100px 110px 1fr 90px auto; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px dashed var(--border); font-size: 12px; }
+  .mlo-lead-row:last-child { border-bottom: none; }
+  .mlo-lead-row .lead-name { font-family: 'Fraunces', serif; font-size: 14px; }
+  .mlo-lead-row .lead-source { font-size: 10px; color: var(--text-dim); }
+  .mlo-lead-row .lead-stage { font-size: 9px; text-transform: uppercase; letter-spacing: 0.15em; padding: 3px 8px; border: 1px solid var(--border); text-align: center; }
+  .mlo-lead-row .lead-stage.contact { color: var(--text-dim); }
+  .mlo-lead-row .lead-stage.qualified { color: var(--blue); border-color: var(--blue); }
+  .mlo-lead-row .lead-stage.application, .mlo-lead-row .lead-stage.processing { color: var(--gold); border-color: var(--gold); }
+  .mlo-lead-row .lead-stage.closing { color: var(--warn); border-color: var(--warn); }
+  .mlo-lead-row .lead-stage.closed { color: var(--green); border-color: var(--green); }
+  .mlo-lead-row .lead-eta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--gold); }
+  .mlo-lead-add { display: grid; grid-template-columns: 1fr 1fr 110px 1fr 110px auto; gap: 6px; }
+  @media (max-width: 900px) { .mlo-lead-add { grid-template-columns: 1fr 1fr; } .mlo-lead-add > button { grid-column: span 2; } }
+  .mlo-lead-add input, .mlo-lead-add select { padding: 8px 10px; font-size: 12px; }
+
+  /* Neuse Tech lean */
+  .lean-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  @media (max-width: 800px) { .lean-grid { grid-template-columns: 1fr; } }
+  .lean-field { display: flex; flex-direction: column; }
+  .lean-field.full { grid-column: 1 / -1; }
+  .lean-field label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--text-dim); margin-bottom: 4px; }
+  .lean-field input { padding: 8px 10px; font-size: 13px; }
+
+  /* Protected strip */
+  .protected-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
+  .protected-tile { border: 1px solid var(--border); padding: 12px 14px; }
+  .protected-tile .label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--text-dim); margin-bottom: 6px; }
+  .protected-tile .val { font-family: 'Fraunces', serif; font-size: 18px; }
+  .protected-tile .sub { font-size: 10px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; margin-top: 4px; }
+
+  /* Kill list */
+  .kill-row { display: grid; grid-template-columns: 1fr 1fr 90px auto; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px dashed var(--border); font-size: 12px; }
+  .kill-row:last-child { border-bottom: none; }
+  .kill-row .kill-name { font-family: 'Fraunces', serif; font-size: 14px; color: var(--text-dim); }
+  .kill-row .kill-condition { font-size: 11px; color: var(--text-dim); }
+  .kill-row .kill-parked { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-faint); }
+  .kill-add { display: grid; grid-template-columns: 1fr 1.5fr 1fr auto; gap: 6px; padding-top: 10px; border-top: 1px dashed var(--border); }
+  @media (max-width: 900px) { .kill-add { grid-template-columns: 1fr 1fr; } .kill-add > button { grid-column: span 2; } }
+  .kill-add input { padding: 8px 10px; font-size: 12px; }
+
   /* People CRM */
   .people-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; align-items: center; }
   .people-filters select, .people-filters input { padding: 6px 8px; font-size: 11px; max-width: 200px; }
@@ -522,6 +632,7 @@
 
 <nav class="tab-nav">
   <button class="tab active" data-view="dashboard" onclick="showView('dashboard')">Dashboard</button>
+  <button class="tab" data-view="ventures" onclick="showView('ventures')">Ventures</button>
   <button class="tab" data-view="goals" onclick="showView('goals')">Goals</button>
   <button class="tab" data-view="workouts" onclick="showView('workouts')">Workouts</button>
   <button class="tab" data-view="finance" onclick="showView('finance')">Finance</button>
@@ -530,6 +641,12 @@
 </nav>
 
 <div class="view" id="view-dashboard">
+
+<div class="card ventures-summary-card" style="margin-bottom: 16px; cursor: pointer;" onclick="showView('ventures')">
+  <div class="card-label">Strategy <span id="vs-phase-tag" style="color:var(--gold);margin-left:8px"></span></div>
+  <div class="card-title">Ventures Portfolio <span class="meta" id="vs-main-quick">—</span></div>
+  <div id="ventures-summary"></div>
+</div>
 
 <div class="card big-three-card" style="margin-bottom: 16px;">
   <div class="card-label">Today <span id="b3-streak" style="color:var(--gold);margin-left:8px"></span></div>
@@ -816,6 +933,152 @@
   </div>
 
 </div><!-- /view-goals -->
+
+<div class="view hidden" id="view-ventures">
+
+  <!-- TIER 1: MAIN BET -->
+  <div class="card main-bet-card" style="margin-bottom: 16px;">
+    <div class="card-label">Tier 1 · Main Bet</div>
+    <div class="card-title">MLO <span class="meta" id="mlo-phase-label">— Exam Sprint</span></div>
+
+    <!-- EXAM SPRINT MODULE -->
+    <div id="mlo-exam-sprint">
+      <div class="exam-hero">
+        <div class="exam-hero-num" id="exam-days-num">—</div>
+        <div class="exam-hero-label">
+          <div class="big">days to SAFE exam</div>
+          <div class="sub" id="exam-date-label">Jun 22</div>
+        </div>
+      </div>
+
+      <div class="exam-stats-row">
+        <div class="exam-stat">
+          <div class="label">Today's study</div>
+          <div class="val" id="exam-today-hours">0.0h <span class="sub" id="exam-today-target">/ 2.0h target</span></div>
+          <div class="bar"><div class="bar-fill" id="exam-today-bar" style="width:0%"></div></div>
+        </div>
+        <div class="exam-stat">
+          <div class="label">Cumulative</div>
+          <div class="val" id="exam-cum-hours">0h <span class="sub" id="exam-target-hours">/ 50h goal</span></div>
+          <div class="bar"><div class="bar-fill" id="exam-cum-bar" style="width:0%"></div></div>
+        </div>
+        <div class="exam-stat">
+          <div class="label">Last mock</div>
+          <div class="val" id="exam-last-mock">—</div>
+          <div class="sub" id="exam-readiness">readiness: not yet</div>
+        </div>
+      </div>
+
+      <div class="exam-section">
+        <div class="card-label" style="margin-bottom:8px">Hours by domain</div>
+        <div id="exam-domains-list"></div>
+      </div>
+
+      <div class="exam-section">
+        <div class="card-label" style="margin-bottom:8px">Mock exams <span id="exam-mocks-meta" class="meta"></span></div>
+        <div id="exam-mocks-chart" class="progress-chart" style="height:140px;margin-top:6px"></div>
+        <div id="exam-mocks-list" style="margin-top:8px"></div>
+      </div>
+
+      <div id="exam-protocol" class="hidden exam-protocol-banner">
+        <strong>Pre-exam protocol active.</strong>
+        <ul>
+          <li>Taper study to ~60-90 min/day; depth over volume</li>
+          <li>Sleep target: 7.5h+ for the next 7 nights</li>
+          <li>Re-read weakest-domain notes the night before</li>
+          <li>Confirm test center location, ID, arrival time</li>
+        </ul>
+      </div>
+
+      <div class="exam-actions" style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn" onclick="openStudyLogModal()">+ Log study session</button>
+        <button class="btn btn-secondary" onclick="openMockLogModal()">+ Log mock test</button>
+        <button class="btn btn-secondary btn-sm" onclick="openExamSettings()">Settings</button>
+      </div>
+    </div>
+
+    <!-- POST-EXAM MILESTONES -->
+    <div class="mlo-section" style="margin-top:24px;padding-top:18px;border-top:1px dashed var(--border)">
+      <div class="card-label">After exam · Build phase</div>
+      <div class="card-title-sm" style="font-family:'Fraunces',serif;font-size:15px;margin:6px 0 10px">Milestones</div>
+      <div id="mlo-milestones-list"></div>
+    </div>
+
+    <!-- REFERRAL LEADS -->
+    <div class="mlo-section" style="margin-top:24px;padding-top:18px;border-top:1px dashed var(--border)">
+      <div class="card-label">Pipeline</div>
+      <div class="card-title-sm" style="font-family:'Fraunces',serif;font-size:15px;margin:6px 0 10px">Referral leads <span class="meta" id="mlo-leads-meta">0</span></div>
+      <div id="mlo-leads-list"></div>
+      <div class="mlo-lead-add" style="margin-top:10px">
+        <input type="text" id="mlo-lead-name" placeholder="Lead name">
+        <input type="text" id="mlo-lead-source" placeholder="Source (who referred)">
+        <select id="mlo-lead-stage">
+          <option value="contact">Contact</option>
+          <option value="qualified">Qualified</option>
+          <option value="application">Application</option>
+          <option value="processing">Processing</option>
+          <option value="closing">Closing</option>
+          <option value="closed">Closed</option>
+        </select>
+        <input type="text" id="mlo-lead-next" placeholder="Next action">
+        <input type="date" id="mlo-lead-eta">
+        <button class="btn btn-sm" onclick="addMloLead()">Add</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIER 2: ACTIVE LEAN -->
+  <div class="card lean-card" style="margin-bottom: 16px;">
+    <div class="card-label">Tier 2 · Active Lean</div>
+    <div class="card-title">Neuse Tech <span class="meta" id="neuse-meta">—</span></div>
+    <div class="lean-grid">
+      <div class="lean-field">
+        <label>Revenue MTD</label>
+        <input type="number" step="0.01" id="neuse-mtd" placeholder="0">
+      </div>
+      <div class="lean-field">
+        <label>Active clients</label>
+        <input type="number" min="0" id="neuse-clients" placeholder="0">
+      </div>
+      <div class="lean-field">
+        <label>Open referrals</label>
+        <input type="number" min="0" id="neuse-referrals" placeholder="0">
+      </div>
+      <div class="lean-field full">
+        <label>Positioning hypothesis</label>
+        <input type="text" id="neuse-positioning" placeholder="e.g. local tech concierge / SMB IT / smart-home / recurring support">
+      </div>
+      <div class="lean-field full">
+        <label>Single next action</label>
+        <input type="text" id="neuse-next-action" placeholder="The one thing that moves this forward this week">
+      </div>
+    </div>
+    <button class="btn btn-sm" onclick="saveNeuseLean()" style="margin-top:12px">Save</button>
+    <span id="neuse-saved" style="font-size:11px;color:var(--text-dim);margin-left:8px"></span>
+  </div>
+
+  <!-- TIER 3: PROTECTED -->
+  <div class="card protected-card" style="margin-bottom: 16px;">
+    <div class="card-label">Tier 3 · Protected</div>
+    <div class="card-title">VP + Body <span class="meta">bankroll · maintenance</span></div>
+    <div class="protected-strip" id="protected-strip"></div>
+  </div>
+
+  <!-- TIER 4: KILL LIST -->
+  <div class="card killed-card">
+    <div class="card-label">Tier 4 · Deferred</div>
+    <div class="card-title">Kill List <span class="meta" id="kill-list-meta">0 parked</span></div>
+    <div style="font-size:11px;color:var(--text-dim);margin-bottom:12px">Explicitly NOT working on these. Adding back to the active queue requires meeting the revive condition.</div>
+    <div id="kill-list"></div>
+    <div class="kill-add" style="margin-top:10px">
+      <input type="text" id="kill-name" placeholder="Venture name">
+      <input type="text" id="kill-condition" placeholder="Revive condition (e.g. when MLO at $5k/mo)">
+      <input type="text" id="kill-note" placeholder="Note (optional)">
+      <button class="btn btn-sm" onclick="addKillItem()">Park</button>
+    </div>
+  </div>
+
+</div><!-- /view-ventures -->
 
 <div class="view hidden" id="view-finance">
 
@@ -1108,8 +1371,78 @@ const firebaseConfig = {
       ai: { weeklyDigests: {}, bigThreeSuggestions: {}, qaHistory: [], briefs: {} },
       people: [],
       recurring: [],
+      ventures: null,
       lastDate: todayStr(), createdAt: todayStr()
     };
+  }
+
+  function defaultVenturesShape() {
+    return {
+      mainBet: {
+        name: 'MLO',
+        activePhase: 'exam_sprint',
+        exam: {
+          date: '2026-06-22',
+          studyTargetHours: 50,
+          dailyTargetHours: 2,
+          domains: [
+            { id: uid(), name: 'Federal Mortgage-Related Laws', targetPct: 24 },
+            { id: uid(), name: 'General Mortgage Knowledge', targetPct: 20 },
+            { id: uid(), name: 'MLO Activities', targetPct: 27 },
+            { id: uid(), name: 'Ethics', targetPct: 18 },
+            { id: uid(), name: 'Uniform State Test', targetPct: 11 }
+          ],
+          studyLog: [],
+          mocks: [],
+          readyThresholdMocks: 3,
+          readyThresholdScore: 90
+        },
+        postExam: {
+          milestones: [
+            { id: uid(), text: 'License application submitted', done: false },
+            { id: uid(), text: 'Personal MLO brand asset shipped (1-page site or LinkedIn refresh)', done: false },
+            { id: uid(), text: 'Referral intake process defined (form, follow-up cadence)', done: false },
+            { id: uid(), text: 'CRM/follow-up system live', done: false },
+            { id: uid(), text: 'Simple content/distribution engine launched', done: false },
+            { id: uid(), text: 'Niche defined (e.g. first-time buyers, military, self-employed)', done: false },
+            { id: uid(), text: 'First 3 named referral leads in pipeline', done: false },
+            { id: uid(), text: 'First closed deal', done: false }
+          ]
+        },
+        leads: []
+      },
+      activeLean: {
+        name: 'Neuse Tech',
+        revenueMtd: 0,
+        clientCount: 1,
+        openReferrals: 0,
+        positioning: 'repair (current) — explore: local tech concierge / SMB IT / smart-home / recurring support',
+        nextAction: '',
+        lastUpdated: ''
+      },
+      killList: [
+        { id: uid(), name: 'Hustle Haus', condition: 'Revisit after MLO licensed AND $5K/mo MLO revenue', note: '', parkedSince: todayStr() },
+        { id: uid(), name: 'SwiftCashHome', condition: 'Revisit after MLO first deal closed', note: '', parkedSince: todayStr() },
+        { id: uid(), name: 'Glacier Travels', condition: 'Revisit after MLO at $10K/mo', note: '', parkedSince: todayStr() },
+        { id: uid(), name: 'GLP-1 opportunity', condition: 'Revisit Q4 2026', note: '', parkedSince: todayStr() },
+        { id: uid(), name: 'Mobile apps (general)', condition: 'Revisit Q4 2026', note: '', parkedSince: todayStr() },
+        { id: uid(), name: 'AI day trading tool', condition: 'Revisit after MLO licensed AND first deal closed', note: 'Captured 2026-05-27. Surfaced as new build idea; deferred to defend MLO commitment.', parkedSince: todayStr() }
+      ]
+    };
+  }
+
+  function ensureVenturesShape() {
+    if (!state.ventures || typeof state.ventures !== 'object') state.ventures = defaultVenturesShape();
+    const v = state.ventures;
+    if (!v.mainBet || typeof v.mainBet !== 'object') v.mainBet = defaultVenturesShape().mainBet;
+    if (!v.mainBet.exam || typeof v.mainBet.exam !== 'object') v.mainBet.exam = defaultVenturesShape().mainBet.exam;
+    if (!Array.isArray(v.mainBet.exam.domains)) v.mainBet.exam.domains = defaultVenturesShape().mainBet.exam.domains;
+    if (!Array.isArray(v.mainBet.exam.studyLog)) v.mainBet.exam.studyLog = [];
+    if (!Array.isArray(v.mainBet.exam.mocks)) v.mainBet.exam.mocks = [];
+    if (!v.mainBet.postExam || !Array.isArray(v.mainBet.postExam.milestones)) v.mainBet.postExam = defaultVenturesShape().mainBet.postExam;
+    if (!Array.isArray(v.mainBet.leads)) v.mainBet.leads = [];
+    if (!v.activeLean || typeof v.activeLean !== 'object') v.activeLean = defaultVenturesShape().activeLean;
+    if (!Array.isArray(v.killList)) v.killList = defaultVenturesShape().killList;
   }
 
   function ensureWorkoutShape() {
@@ -3736,6 +4069,40 @@ const firebaseConfig = {
     lines.push(`Date: ${today} (${dateObj.toLocaleDateString('en-US', { weekday: 'long' })})`);
     lines.push('');
 
+    // VENTURES HIERARCHY — lead with this so AI biases every response toward the main bet
+    if (state.ventures && state.ventures.mainBet) {
+      const v = state.ventures;
+      const exam = v.mainBet.exam;
+      const days = getDaysToExam();
+      const todayH = getTodayStudyHours();
+      const cumH = getCumulativeStudyHours();
+      const readiness = getExamReadiness();
+      lines.push('## VENTURE HIERARCHY (use this to weight every recommendation)');
+      lines.push(`- TIER 1 — MAIN BET: ${v.mainBet.name} (${v.mainBet.activePhase}). MLO SAFE exam on ${exam.date}, ${days} days away. Today's study: ${todayH.toFixed(1)}h / ${exam.dailyTargetHours}h target. Cumulative: ${cumH.toFixed(1)}h / ${exam.studyTargetHours}h. Mocks: ${exam.mocks.length} logged. Readiness: ${readiness.label}.`);
+      const weakest = getWeakestDomain();
+      if (weakest) lines.push(`  Weakest domain right now: ${weakest.name}.`);
+      lines.push(`- TIER 2 — ACTIVE LEAN: ${v.activeLean.name}. Revenue MTD: $${v.activeLean.revenueMtd}. Clients: ${v.activeLean.clientCount}. Open referrals: ${v.activeLean.openReferrals}. Positioning: "${v.activeLean.positioning}". Next action: "${v.activeLean.nextAction || '—'}". BOUNDED EFFORT — should not expand to compete with Main Bet.`);
+      lines.push(`- TIER 3 — PROTECTED: VP role (W2 bankroll) + body (maintenance mode only). Don't recommend pushing harder here.`);
+      lines.push(`- TIER 4 — DEFERRED (kill list, ${v.killList.length} parked, DO NOT recommend working on these): ${v.killList.map(k => k.name).join(', ')}.`);
+      lines.push('Rule: prioritize recommendations that advance Tier 1 (MLO exam → license → first deal). Tier 2 next-action is fine. Never suggest restarting a Tier 4 item.');
+      lines.push('');
+
+      // Post-exam milestones
+      const openMilestones = v.mainBet.postExam.milestones.filter(m => !m.done);
+      if (openMilestones.length > 0) {
+        lines.push('### MLO post-exam milestones (open)');
+        openMilestones.forEach(m => lines.push(`  - [ ] ${m.text}`));
+        lines.push('');
+      }
+
+      // Leads
+      if (v.mainBet.leads.length > 0) {
+        lines.push(`### MLO referral pipeline (${v.mainBet.leads.length} leads)`);
+        v.mainBet.leads.forEach(L => lines.push(`  - ${L.name} (${L.stage})${L.source ? ' via ' + L.source : ''}${L.nextAction ? ' — next: ' + L.nextAction : ''}${L.eta ? ' [eta ' + L.eta + ']' : ''}`));
+        lines.push('');
+      }
+    }
+
     lines.push('## Big 3 today');
     if (state.bigThree.items.length === 0) lines.push('(none set)');
     state.bigThree.items.forEach((item, i) => lines.push(`${i + 1}. [${item.done ? 'x' : ' '}] ${item.text}`));
@@ -4255,7 +4622,23 @@ const firebaseConfig = {
     }
     if (highPriority > 0) taskSub = `${highPriority} high · ` + taskSub;
 
-    const tiles = [
+    const tiles = [];
+
+    if (state.ventures && state.ventures.mainBet && state.ventures.mainBet.activePhase === 'exam_sprint') {
+      const days = getDaysToExam();
+      const todayStudyH = getTodayStudyHours();
+      const targetH = state.ventures.mainBet.exam.dailyTargetHours;
+      const examCls = days <= 7 ? 'alert' : (days <= 14 ? 'warn' : '');
+      tiles.push({
+        label: 'MLO Exam',
+        num: `${Math.max(0, days)}d`,
+        sub: `${todayStudyH.toFixed(1)}h / ${targetH}h today`,
+        cls: examCls,
+        action: `showView('ventures')`
+      });
+    }
+
+    tiles.push(
       {
         label: 'Habits',
         num: habitTotal > 0 ? `${habitDone}/${habitTotal}` : '—',
@@ -4298,7 +4681,7 @@ const firebaseConfig = {
         cls: taskCls,
         action: `scrollToEl('task-list')`
       }
-    ];
+    );
     if (krCount > 0) {
       tiles.push({
         label: 'Key Results',
@@ -5059,6 +5442,577 @@ const firebaseConfig = {
     renderFinance();
   };
 
+  // VENTURES
+  function daysBetween(a, b) {
+    const da = new Date(a + 'T00:00:00');
+    const db = new Date(b + 'T00:00:00');
+    return Math.round((db - da) / 86400000);
+  }
+
+  function venturesExam() { return state.ventures.mainBet.exam; }
+  function venturesMain() { return state.ventures.mainBet; }
+
+  function getDaysToExam() {
+    return daysBetween(todayStr(), venturesExam().date);
+  }
+
+  function getTodayStudyHours() {
+    const today = todayStr();
+    return venturesExam().studyLog
+      .filter(e => e.date === today)
+      .reduce((sum, e) => sum + (Number(e.hours) || 0), 0);
+  }
+
+  function getCumulativeStudyHours() {
+    return venturesExam().studyLog.reduce((sum, e) => sum + (Number(e.hours) || 0), 0);
+  }
+
+  function getDomainHours(domainId) {
+    return venturesExam().studyLog
+      .filter(e => e.domainId === domainId)
+      .reduce((sum, e) => sum + (Number(e.hours) || 0), 0);
+  }
+
+  function getExamReadiness() {
+    const exam = venturesExam();
+    if (exam.mocks.length === 0) return { ready: false, label: 'no mocks yet', pct: 0 };
+    const recent = exam.mocks.slice().sort((a, b) => b.date.localeCompare(a.date)).slice(0, exam.readyThresholdMocks);
+    if (recent.length < exam.readyThresholdMocks) {
+      return { ready: false, label: `${recent.length}/${exam.readyThresholdMocks} mocks logged`, pct: (recent.length / exam.readyThresholdMocks) * 50 };
+    }
+    const allPass = recent.every(m => m.score >= exam.readyThresholdScore);
+    if (allPass) return { ready: true, label: `ready · last ${recent.length} ≥ ${exam.readyThresholdScore}%`, pct: 100 };
+    const passing = recent.filter(m => m.score >= exam.readyThresholdScore).length;
+    return { ready: false, label: `${passing}/${recent.length} ≥ ${exam.readyThresholdScore}%`, pct: 50 + (passing / recent.length) * 40 };
+  }
+
+  function getWeakestDomain() {
+    const exam = venturesExam();
+    if (exam.mocks.length === 0) {
+      // Use hours: weakest = least hours relative to target weight
+      let weakest = null;
+      let maxGap = -Infinity;
+      const totalHours = getCumulativeStudyHours();
+      exam.domains.forEach(d => {
+        const expected = (d.targetPct / 100) * totalHours;
+        const actual = getDomainHours(d.id);
+        const gap = expected - actual;
+        if (gap > maxGap) { maxGap = gap; weakest = d; }
+      });
+      return weakest;
+    }
+    // Use last mock's weakestDomain field
+    const lastMock = exam.mocks.slice().sort((a, b) => b.date.localeCompare(a.date))[0];
+    if (lastMock.weakestDomainId) {
+      return exam.domains.find(d => d.id === lastMock.weakestDomainId) || null;
+    }
+    return null;
+  }
+
+  function renderVentures() {
+    ensureVenturesShape();
+    renderVenturesSummary();
+    if (!document.getElementById('view-ventures')) return;
+    renderExamSprint();
+    renderMloMilestones();
+    renderMloLeads();
+    renderNeuseLean();
+    renderProtectedStrip();
+    renderKillList();
+  }
+
+  function renderVenturesSummary() {
+    const container = document.getElementById('ventures-summary');
+    const phaseTag = document.getElementById('vs-phase-tag');
+    const mainQuick = document.getElementById('vs-main-quick');
+    if (!container) return;
+
+    const days = getDaysToExam();
+    const todayH = getTodayStudyHours();
+    const target = venturesExam().dailyTargetHours;
+    const exam = venturesExam();
+    if (phaseTag) phaseTag.textContent = venturesMain().activePhase === 'exam_sprint' ? `· Exam Sprint · ${days}d` : '· Build phase';
+
+    const lean = state.ventures.activeLean;
+    const killCount = state.ventures.killList.length;
+
+    if (mainQuick) {
+      mainQuick.textContent = venturesMain().activePhase === 'exam_sprint'
+        ? `MLO · ${days}d to exam · ${todayH.toFixed(1)}/${target}h today`
+        : 'MLO · Build phase';
+    }
+
+    container.innerHTML = `
+      <div class="vs-line vs-main">
+        <span class="vs-tag">Main Bet</span>
+        <span class="vs-name">MLO</span>
+        <span class="vs-detail">${venturesMain().activePhase === 'exam_sprint' ? `Exam <strong>${exam.date}</strong> · ${days}d left · ${todayH.toFixed(1)}h today` : 'Build phase'}</span>
+      </div>
+      <div class="vs-line vs-lean">
+        <span class="vs-tag">Active Lean</span>
+        <span class="vs-name">${escapeHtml(lean.name)}</span>
+        <span class="vs-detail">$${(Number(lean.revenueMtd) || 0).toFixed(0)} MTD · ${lean.clientCount || 0} client${lean.clientCount === 1 ? '' : 's'} · ${lean.openReferrals || 0} ref${lean.openReferrals === 1 ? '' : 's'}${lean.nextAction ? ' · next: ' + escapeHtml(lean.nextAction).slice(0, 50) : ''}</span>
+      </div>
+      <div class="vs-line vs-protected">
+        <span class="vs-tag">Protected</span>
+        <span class="vs-name">VP + Body</span>
+        <span class="vs-detail">bankroll · maintenance mode</span>
+      </div>
+      <div class="vs-line vs-killed">
+        <span class="vs-tag">Killed</span>
+        <span class="vs-name">${killCount} parked</span>
+        <span class="vs-detail">${state.ventures.killList.slice(0, 3).map(k => escapeHtml(k.name)).join(' · ')}${killCount > 3 ? ` · +${killCount - 3} more` : ''}</span>
+      </div>
+    `;
+  }
+
+  function renderExamSprint() {
+    const sprint = document.getElementById('mlo-exam-sprint');
+    if (!sprint) return;
+    const exam = venturesExam();
+    const days = getDaysToExam();
+    const todayH = getTodayStudyHours();
+    const cumH = getCumulativeStudyHours();
+    const target = exam.dailyTargetHours;
+    const totalTarget = exam.studyTargetHours;
+
+    const daysEl = document.getElementById('exam-days-num');
+    daysEl.textContent = Math.max(0, days);
+    daysEl.className = 'exam-hero-num';
+    if (days <= 7) daysEl.classList.add('urgent');
+    else if (days <= 14) daysEl.classList.add('warn');
+
+    document.getElementById('exam-date-label').textContent = new Date(exam.date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'long', day: 'numeric', year: 'numeric' });
+
+    document.getElementById('exam-today-hours').innerHTML = `${todayH.toFixed(1)}h <span class="sub">/ ${target}h target</span>`;
+    const todayBar = document.getElementById('exam-today-bar');
+    const todayPct = Math.min(100, (todayH / target) * 100);
+    todayBar.style.width = todayPct + '%';
+    todayBar.classList.toggle('over', todayH >= target);
+
+    document.getElementById('exam-cum-hours').innerHTML = `${cumH.toFixed(1)}h <span class="sub">/ ${totalTarget}h goal</span>`;
+    const cumBar = document.getElementById('exam-cum-bar');
+    const cumPct = Math.min(100, (cumH / totalTarget) * 100);
+    cumBar.style.width = cumPct + '%';
+    cumBar.classList.toggle('over', cumH >= totalTarget);
+
+    const lastMock = exam.mocks.slice().sort((a, b) => b.date.localeCompare(a.date))[0];
+    document.getElementById('exam-last-mock').textContent = lastMock ? `${lastMock.score}% · ${lastMock.date.slice(5)}` : '—';
+    const readiness = getExamReadiness();
+    document.getElementById('exam-readiness').textContent = readiness.label;
+    document.getElementById('exam-readiness').style.color = readiness.ready ? 'var(--green)' : 'var(--text-dim)';
+
+    renderExamDomains();
+    renderExamMocks();
+
+    document.getElementById('exam-protocol').classList.toggle('hidden', days > 7);
+  }
+
+  function renderExamDomains() {
+    const list = document.getElementById('exam-domains-list');
+    if (!list) return;
+    const exam = venturesExam();
+    const totalH = getCumulativeStudyHours();
+    list.innerHTML = '';
+    exam.domains.forEach(d => {
+      const hours = getDomainHours(d.id);
+      const expectedHours = (d.targetPct / 100) * exam.studyTargetHours;
+      const pct = expectedHours > 0 ? Math.min(100, (hours / expectedHours) * 100) : 0;
+      const isWeak = totalH > 5 && hours < (d.targetPct / 100) * totalH * 0.7;
+      const row = document.createElement('div');
+      row.className = 'exam-domain-row';
+      row.innerHTML = `
+        <span class="name">${escapeHtml(d.name)}</span>
+        <span class="target-tag">~${d.targetPct}% weight</span>
+        <span class="hours">${hours.toFixed(1)}h</span>
+        <div class="domain-bar"><div class="domain-bar-fill ${isWeak ? 'weak' : ''}" style="width:${pct}%"></div></div>
+      `;
+      list.appendChild(row);
+    });
+  }
+
+  function renderExamMocks() {
+    const list = document.getElementById('exam-mocks-list');
+    const chart = document.getElementById('exam-mocks-chart');
+    const meta = document.getElementById('exam-mocks-meta');
+    if (!list) return;
+    const exam = venturesExam();
+    const mocks = exam.mocks.slice().sort((a, b) => a.date.localeCompare(b.date));
+    meta.textContent = mocks.length + (mocks.length === 1 ? ' test' : ' tests');
+
+    if (mocks.length === 0) {
+      list.innerHTML = '<div class="empty" style="padding:10px">No mock tests logged yet.</div>';
+      chart.innerHTML = '<div class="empty" style="padding:20px">Log a mock to see the readiness trend.</div>';
+      return;
+    }
+
+    // Chart
+    const w = 700, h = 140, padLeft = 36, padRight = 12, padTop = 12, padBottom = 24;
+    const innerW = w - padLeft - padRight;
+    const innerH = h - padTop - padBottom;
+    const yMin = 50, yMax = 100;
+    const yRange = yMax - yMin;
+    const xFor = i => mocks.length === 1 ? padLeft + innerW / 2 : padLeft + (i / (mocks.length - 1)) * innerW;
+    const yFor = v => padTop + innerH - ((v - yMin) / yRange) * innerH;
+    const pathD = mocks.map((p, i) => `${i === 0 ? 'M' : 'L'} ${xFor(i)} ${yFor(p.score)}`).join(' ');
+    const yTicks = [50, 75, 90, 100];
+    const yLabels = yTicks.map(v => `<text class="chart-text y" x="${padLeft - 4}" y="${yFor(v) + 3}">${v}</text>`).join('');
+    const grid = yTicks.map(v => `<line class="chart-grid" x1="${padLeft}" y1="${yFor(v)}" x2="${w - padRight}" y2="${yFor(v)}"/>`).join('');
+    const passLine = `<line stroke="var(--gold)" stroke-dasharray="3 3" stroke-width="1" x1="${padLeft}" y1="${yFor(75)}" x2="${w - padRight}" y2="${yFor(75)}"/>`;
+    const readyLine = `<line stroke="var(--green)" stroke-dasharray="3 3" stroke-width="1" x1="${padLeft}" y1="${yFor(exam.readyThresholdScore)}" x2="${w - padRight}" y2="${yFor(exam.readyThresholdScore)}"/>`;
+    const xLabels = mocks.map((p, i) => `<text class="chart-text x" x="${xFor(i)}" y="${h - padBottom + 14}">${p.date.slice(5)}</text>`).join('');
+    const dots = mocks.map((p, i) => `<circle cx="${xFor(i)}" cy="${yFor(p.score)}" r="3" fill="${p.score >= exam.readyThresholdScore ? 'var(--green)' : (p.score >= 75 ? 'var(--gold)' : 'var(--accent)')}"><title>${p.date}: ${p.score}%</title></circle>`).join('');
+    chart.innerHTML = `
+      <svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet" style="width:100%;height:100%">
+        ${grid}
+        ${passLine}
+        ${readyLine}
+        <line class="chart-axis" x1="${padLeft}" y1="${padTop}" x2="${padLeft}" y2="${h - padBottom}"/>
+        <line class="chart-axis" x1="${padLeft}" y1="${h - padBottom}" x2="${w - padRight}" y2="${h - padBottom}"/>
+        ${yLabels}
+        ${xLabels}
+        <path d="${pathD}" class="chart-line"/>
+        ${dots}
+      </svg>
+    `;
+
+    // List
+    list.innerHTML = '';
+    mocks.slice().reverse().slice(0, 10).forEach(m => {
+      const weakDomain = m.weakestDomainId ? venturesExam().domains.find(d => d.id === m.weakestDomainId) : null;
+      const row = document.createElement('div');
+      row.className = 'exam-mock-row';
+      const scoreCls = m.score >= exam.readyThresholdScore ? 'pass' : (m.score >= 75 ? '' : 'fail');
+      row.innerHTML = `
+        <span class="mock-date">${m.date}</span>
+        <span class="mock-score ${scoreCls}">${m.score}%</span>
+        <span>${m.timeMinutes ? m.timeMinutes + ' min' : ''}</span>
+        <span style="font-size:11px;color:var(--text-dim)">${weakDomain ? 'weak: ' + escapeHtml(weakDomain.name).slice(0, 28) : ''}${m.note ? ' · ' + escapeHtml(m.note).slice(0, 40) : ''}</span>
+        <button class="task-del" type="button">×</button>
+      `;
+      row.querySelector('button').onclick = () => {
+        if (!confirm('Delete this mock?')) return;
+        venturesExam().mocks = venturesExam().mocks.filter(x => x.id !== m.id);
+        debouncedSave();
+        renderVentures();
+      };
+      list.appendChild(row);
+    });
+  }
+
+  window.openStudyLogModal = () => {
+    const domains = venturesExam().domains;
+    showModal(`
+      <h3>Log study session</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">
+        <div><label style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.2em">Date</label><input type="date" id="study-date" value="${todayStr()}" style="width:100%;padding:8px"></div>
+        <div><label style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.2em">Hours</label><input type="number" step="0.25" id="study-hours" placeholder="1.5" style="width:100%;padding:8px"></div>
+      </div>
+      <div style="margin-top:10px"><label style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.2em">Domain</label>
+        <select id="study-domain" style="width:100%;padding:8px">
+          <option value="">— general / mixed —</option>
+          ${domains.map(d => `<option value="${d.id}">${escapeHtml(d.name)}</option>`).join('')}
+        </select>
+      </div>
+      <div style="margin-top:10px"><label style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.2em">Note (optional)</label>
+        <input type="text" id="study-note" placeholder="What you covered" style="width:100%;padding:8px">
+      </div>
+      <div class="modal-actions" style="margin-top:14px;display:flex;gap:8px">
+        <button class="btn" onclick="confirmStudyLog()">Log</button>
+        <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      </div>
+    `);
+  };
+
+  window.confirmStudyLog = () => {
+    const date = document.getElementById('study-date').value || todayStr();
+    const hours = Number(document.getElementById('study-hours').value);
+    const domainId = document.getElementById('study-domain').value || null;
+    const note = document.getElementById('study-note').value.trim();
+    if (!Number.isFinite(hours) || hours <= 0) { alert('Enter positive hours.'); return; }
+    venturesExam().studyLog.push({ id: uid(), date, hours, domainId, note, ts: Date.now() });
+    closeModal();
+    debouncedSave();
+    renderVentures();
+  };
+
+  window.openMockLogModal = () => {
+    const domains = venturesExam().domains;
+    showModal(`
+      <h3>Log mock test</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:12px">
+        <div><label style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.2em">Date</label><input type="date" id="mock-date" value="${todayStr()}" style="width:100%;padding:8px"></div>
+        <div><label style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.2em">Score %</label><input type="number" step="1" min="0" max="100" id="mock-score" placeholder="85" style="width:100%;padding:8px"></div>
+        <div><label style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.2em">Time (min)</label><input type="number" min="0" id="mock-time" placeholder="120" style="width:100%;padding:8px"></div>
+      </div>
+      <div style="margin-top:10px"><label style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.2em">Weakest domain</label>
+        <select id="mock-weak" style="width:100%;padding:8px">
+          <option value="">— none / unsure —</option>
+          ${domains.map(d => `<option value="${d.id}">${escapeHtml(d.name)}</option>`).join('')}
+        </select>
+      </div>
+      <div style="margin-top:10px"><label style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.2em">Note (optional)</label>
+        <input type="text" id="mock-note" placeholder="Insights, questions to revisit" style="width:100%;padding:8px">
+      </div>
+      <div class="modal-actions" style="margin-top:14px;display:flex;gap:8px">
+        <button class="btn" onclick="confirmMockLog()">Log</button>
+        <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      </div>
+    `);
+  };
+
+  window.confirmMockLog = () => {
+    const date = document.getElementById('mock-date').value || todayStr();
+    const score = Number(document.getElementById('mock-score').value);
+    const timeMinutes = Number(document.getElementById('mock-time').value) || null;
+    const weakestDomainId = document.getElementById('mock-weak').value || null;
+    const note = document.getElementById('mock-note').value.trim();
+    if (!Number.isFinite(score) || score < 0 || score > 100) { alert('Score must be 0-100.'); return; }
+    venturesExam().mocks.push({ id: uid(), date, score, timeMinutes, weakestDomainId, note, ts: Date.now() });
+    closeModal();
+    debouncedSave();
+    renderVentures();
+  };
+
+  window.openExamSettings = () => {
+    const exam = venturesExam();
+    showModal(`
+      <h3>Exam settings</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">
+        <div><label style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.2em">Exam date</label><input type="date" id="es-date" value="${exam.date}" style="width:100%;padding:8px"></div>
+        <div><label style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.2em">Daily target (h)</label><input type="number" step="0.25" id="es-daily" value="${exam.dailyTargetHours}" style="width:100%;padding:8px"></div>
+        <div><label style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.2em">Total target (h)</label><input type="number" step="1" id="es-total" value="${exam.studyTargetHours}" style="width:100%;padding:8px"></div>
+        <div><label style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.2em">Ready threshold %</label><input type="number" step="1" min="0" max="100" id="es-ready" value="${exam.readyThresholdScore}" style="width:100%;padding:8px"></div>
+      </div>
+      <div class="modal-actions" style="margin-top:14px;display:flex;gap:8px">
+        <button class="btn" onclick="saveExamSettings()">Save</button>
+        <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      </div>
+    `);
+  };
+
+  window.saveExamSettings = () => {
+    const exam = venturesExam();
+    exam.date = document.getElementById('es-date').value || exam.date;
+    exam.dailyTargetHours = Number(document.getElementById('es-daily').value) || exam.dailyTargetHours;
+    exam.studyTargetHours = Number(document.getElementById('es-total').value) || exam.studyTargetHours;
+    exam.readyThresholdScore = Number(document.getElementById('es-ready').value) || exam.readyThresholdScore;
+    closeModal();
+    debouncedSave();
+    renderVentures();
+  };
+
+  // MLO milestones
+  function renderMloMilestones() {
+    const list = document.getElementById('mlo-milestones-list');
+    if (!list) return;
+    list.innerHTML = '';
+    venturesMain().postExam.milestones.forEach(m => {
+      const row = document.createElement('div');
+      row.className = 'milestone-row';
+      row.innerHTML = `
+        <button class="milestone-check ${m.done ? 'done' : ''}" type="button"></button>
+        <span class="milestone-text ${m.done ? 'done' : ''}">${escapeHtml(m.text)}</span>
+        <button class="set-add" style="font-size:10px" type="button" data-act="edit">edit</button>
+        <button class="task-del" type="button" data-act="del">×</button>
+      `;
+      row.querySelector('.milestone-check').onclick = () => {
+        m.done = !m.done;
+        m.completedAt = m.done ? todayStr() : null;
+        debouncedSave();
+        renderVentures();
+      };
+      row.querySelector('[data-act="edit"]').onclick = () => {
+        const t = prompt('Milestone:', m.text);
+        if (t == null) return;
+        if (t.trim()) m.text = t.trim();
+        debouncedSave();
+        renderVentures();
+      };
+      row.querySelector('[data-act="del"]').onclick = () => {
+        if (!confirm('Delete milestone?')) return;
+        venturesMain().postExam.milestones = venturesMain().postExam.milestones.filter(x => x.id !== m.id);
+        debouncedSave();
+        renderVentures();
+      };
+      list.appendChild(row);
+    });
+  }
+
+  // MLO leads
+  function renderMloLeads() {
+    const list = document.getElementById('mlo-leads-list');
+    const meta = document.getElementById('mlo-leads-meta');
+    if (!list) return;
+    const leads = venturesMain().leads;
+    meta.textContent = leads.length + (leads.length === 1 ? ' lead' : ' leads');
+    list.innerHTML = '';
+    if (leads.length === 0) {
+      list.innerHTML = '<div class="empty" style="padding:10px;font-size:12px">No leads yet. Add the first 3 trusted friends who can refer buyers.</div>';
+      return;
+    }
+    const STAGE_ORDER = ['contact', 'qualified', 'application', 'processing', 'closing', 'closed'];
+    leads.slice().sort((a, b) => STAGE_ORDER.indexOf(b.stage) - STAGE_ORDER.indexOf(a.stage)).forEach(L => {
+      const row = document.createElement('div');
+      row.className = 'mlo-lead-row';
+      row.innerHTML = `
+        <div>
+          <div class="lead-name">${escapeHtml(L.name)}</div>
+          ${L.source ? `<div class="lead-source">via ${escapeHtml(L.source)}</div>` : ''}
+        </div>
+        <span class="lead-stage ${L.stage}">${L.stage}</span>
+        <span class="lead-eta">${L.eta || '—'}</span>
+        <span style="font-size:11px;color:var(--text-dim)">${escapeHtml(L.nextAction || '—')}</span>
+        <button class="set-add" style="font-size:10px" type="button" data-act="advance">advance</button>
+        <button class="task-del" type="button" data-act="del">×</button>
+      `;
+      row.querySelector('[data-act="advance"]').onclick = () => {
+        const idx = STAGE_ORDER.indexOf(L.stage);
+        if (idx >= 0 && idx < STAGE_ORDER.length - 1) {
+          L.stage = STAGE_ORDER[idx + 1];
+          const next = prompt(`Advanced to ${L.stage}. Next action?`, '');
+          if (next != null && next.trim()) L.nextAction = next.trim();
+          debouncedSave();
+          renderVentures();
+        }
+      };
+      row.querySelector('[data-act="del"]').onclick = () => {
+        if (!confirm(`Delete lead "${L.name}"?`)) return;
+        venturesMain().leads = venturesMain().leads.filter(x => x.id !== L.id);
+        debouncedSave();
+        renderVentures();
+      };
+      list.appendChild(row);
+    });
+  }
+
+  window.addMloLead = () => {
+    const name = document.getElementById('mlo-lead-name').value.trim();
+    if (!name) return;
+    const source = document.getElementById('mlo-lead-source').value.trim();
+    const stage = document.getElementById('mlo-lead-stage').value;
+    const nextAction = document.getElementById('mlo-lead-next').value.trim();
+    const eta = document.getElementById('mlo-lead-eta').value || null;
+    venturesMain().leads.push({ id: uid(), name, source, stage, nextAction, eta, createdAt: todayStr() });
+    document.getElementById('mlo-lead-name').value = '';
+    document.getElementById('mlo-lead-source').value = '';
+    document.getElementById('mlo-lead-next').value = '';
+    document.getElementById('mlo-lead-eta').value = '';
+    debouncedSave();
+    renderVentures();
+  };
+
+  // Neuse Tech lean
+  function renderNeuseLean() {
+    const lean = state.ventures.activeLean;
+    const meta = document.getElementById('neuse-meta');
+    if (!meta) return;
+    meta.textContent = `$${(Number(lean.revenueMtd) || 0).toFixed(0)} MTD · ${lean.clientCount || 0} client${lean.clientCount === 1 ? '' : 's'}`;
+    const fields = [
+      ['neuse-mtd', lean.revenueMtd],
+      ['neuse-clients', lean.clientCount],
+      ['neuse-referrals', lean.openReferrals],
+      ['neuse-positioning', lean.positioning],
+      ['neuse-next-action', lean.nextAction]
+    ];
+    fields.forEach(([id, val]) => {
+      const el = document.getElementById(id);
+      if (el && document.activeElement !== el) el.value = val == null ? '' : val;
+    });
+  }
+
+  window.saveNeuseLean = () => {
+    const lean = state.ventures.activeLean;
+    lean.revenueMtd = Number(document.getElementById('neuse-mtd').value) || 0;
+    lean.clientCount = Number(document.getElementById('neuse-clients').value) || 0;
+    lean.openReferrals = Number(document.getElementById('neuse-referrals').value) || 0;
+    lean.positioning = document.getElementById('neuse-positioning').value.trim();
+    lean.nextAction = document.getElementById('neuse-next-action').value.trim();
+    lean.lastUpdated = todayStr();
+    debouncedSave();
+    const status = document.getElementById('neuse-saved');
+    if (status) {
+      status.textContent = 'Saved.';
+      setTimeout(() => { if (status.textContent === 'Saved.') status.textContent = ''; }, 2000);
+    }
+    renderVentures();
+  };
+
+  // Protected strip
+  function renderProtectedStrip() {
+    const container = document.getElementById('protected-strip');
+    if (!container) return;
+    const today = todayStr();
+    const weekStart = new Date(today + 'T00:00:00');
+    weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+    const weekStartStr = localDateStr(weekStart);
+
+    // VP hours this week = sessions with category containing 'VP' or 'Work' OR all sessions if no category
+    const vpHours = state.sessions
+      .filter(s => s.date >= weekStartStr)
+      .reduce((sum, s) => sum + (Number(s.seconds) || 0), 0) / 3600;
+
+    // Body workouts this week
+    const workouts = state.workout.sessions.filter(s => s.date >= weekStartStr).length;
+
+    container.innerHTML = `
+      <div class="protected-tile">
+        <div class="label">VP focus hours · week</div>
+        <div class="val">${vpHours.toFixed(1)}h</div>
+        <div class="sub">${vpHours > 25 ? 'heavy week' : vpHours > 10 ? 'normal' : 'light'}</div>
+      </div>
+      <div class="protected-tile">
+        <div class="label">Workouts · week</div>
+        <div class="val">${workouts}</div>
+        <div class="sub">${workouts >= 3 ? 'on maintenance' : workouts >= 1 ? 'partial' : 'no lifts'}</div>
+      </div>
+    `;
+  }
+
+  // Kill list
+  function renderKillList() {
+    const list = document.getElementById('kill-list');
+    const meta = document.getElementById('kill-list-meta');
+    if (!list) return;
+    const kill = state.ventures.killList;
+    meta.textContent = `${kill.length} parked`;
+    list.innerHTML = '';
+    if (kill.length === 0) {
+      list.innerHTML = '<div class="empty" style="padding:10px;font-size:12px">No deferred ventures.</div>';
+      return;
+    }
+    kill.forEach(k => {
+      const row = document.createElement('div');
+      row.className = 'kill-row';
+      row.innerHTML = `
+        <span class="kill-name">${escapeHtml(k.name)}</span>
+        <span class="kill-condition">${escapeHtml(k.condition || 'no revive condition')}</span>
+        <span class="kill-parked">parked ${k.parkedSince || '—'}</span>
+        <button class="task-del" type="button">×</button>
+      `;
+      row.querySelector('button').onclick = () => {
+        if (!confirm(`Remove "${k.name}" from kill list? (Doesn't add it back to active queue — just removes the entry.)`)) return;
+        state.ventures.killList = state.ventures.killList.filter(x => x.id !== k.id);
+        debouncedSave();
+        renderVentures();
+      };
+      list.appendChild(row);
+    });
+  }
+
+  window.addKillItem = () => {
+    const name = document.getElementById('kill-name').value.trim();
+    if (!name) return;
+    const condition = document.getElementById('kill-condition').value.trim();
+    const note = document.getElementById('kill-note').value.trim();
+    state.ventures.killList.push({ id: uid(), name, condition, note, parkedSince: todayStr() });
+    document.getElementById('kill-name').value = '';
+    document.getElementById('kill-condition').value = '';
+    document.getElementById('kill-note').value = '';
+    debouncedSave();
+    renderVentures();
+  };
+
   // EXPORT
   window.exportData = () => {
     const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
@@ -5130,6 +6084,7 @@ const firebaseConfig = {
         ensureAiShape();
         ensurePeopleShape();
         ensureRecurringShape();
+        ensureVenturesShape();
         applyDailyResets();
         runRecurringExpansion();
         await setDoc(userDocRef, state);
@@ -5155,6 +6110,7 @@ const firebaseConfig = {
           ensureAiShape();
           ensurePeopleShape();
           ensureRecurringShape();
+          ensureVenturesShape();
           renderAll();
         }
       });
@@ -5197,6 +6153,7 @@ const firebaseConfig = {
     renderMorningBrief();
     renderPeople();
     renderRecurring();
+    renderVentures();
   }
 
   async function init() {
